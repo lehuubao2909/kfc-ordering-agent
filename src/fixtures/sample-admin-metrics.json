@@ -1,0 +1,26 @@
+{
+  "_comment": "Shape khớp GET /api/admin/orders → data.metrics. Dev C render 4 card admin. Số minh hoạ + có assumptions ghi rõ trên UI.",
+  "funnel": {
+    "conversationsStarted": 42,
+    "reachedCart": 31,
+    "confirmed": 24,
+    "paid": 22,
+    "delivered": 19
+  },
+  "aov": {
+    "withoutUpsellVnd": 118000,
+    "withUpsellVnd": 137000,
+    "upliftPct": 16.1,
+    "assumption": "Backtest trên mock POS; giả định acceptance rate upsell ~20% (nguồn: ước tính KFC + benchmark ngành). KHÔNG phải số production."
+  },
+  "upsell": {
+    "offered": 24,
+    "accepted": 11,
+    "acceptanceRatePct": 45.8
+  },
+  "nluEval": {
+    "passed": 18,
+    "total": 20,
+    "comment": "Kết quả scripts/agent-eval-cli-harness.ts — đọc từ eval-results.json khi có"
+  }
+}

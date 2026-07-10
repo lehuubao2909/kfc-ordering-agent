@@ -1,0 +1,100 @@
+[
+  {
+    "id": "KFC-0001",
+    "psid": "24081573210001",
+    "items": [
+      { "itemId": "combo-ga-ran-1-nguoi", "quantity": 1 },
+      { "itemId": "ga-gion-cay-1-mieng", "quantity": 2 },
+      { "itemId": "pepsi-lon", "quantity": 1 }
+    ],
+    "subtotalVnd": 179000,
+    "discountVnd": 20000,
+    "shippingFeeVnd": 15000,
+    "totalVnd": 174000,
+    "voucherCode": "KFC20",
+    "paymentMethod": "cod",
+    "status": "PREPARING",
+    "deliveryAddress": "123 Nguyễn Trãi, P.2, Q.5, TP.HCM",
+    "deliveryPhone": "0901***567",
+    "upsellAccepted": true,
+    "createdAt": "2026-07-11T11:42:00.000Z",
+    "updatedAt": "2026-07-11T11:47:00.000Z"
+  },
+  {
+    "id": "KFC-0002",
+    "psid": "24081573210002",
+    "items": [
+      { "itemId": "burger-zinger", "quantity": 2 },
+      { "itemId": "khoai-tay-chien-vua", "quantity": 1, "note": "ít muối" }
+    ],
+    "subtotalVnd": 135000,
+    "discountVnd": 0,
+    "shippingFeeVnd": 15000,
+    "totalVnd": 150000,
+    "voucherCode": null,
+    "paymentMethod": "qr",
+    "status": "AWAITING_PAYMENT",
+    "deliveryAddress": "45 Lê Lợi, P. Bến Nghé, Q.1, TP.HCM",
+    "deliveryPhone": "0912***888",
+    "upsellAccepted": false,
+    "createdAt": "2026-07-11T12:05:00.000Z",
+    "updatedAt": "2026-07-11T12:06:00.000Z"
+  },
+  {
+    "id": "KFC-0003",
+    "psid": "24081573210003",
+    "items": [
+      { "itemId": "combo-nhom-ban-be", "quantity": 1 },
+      { "itemId": "kem-tuoi", "quantity": 4 }
+    ],
+    "subtotalVnd": 283000,
+    "discountVnd": 0,
+    "shippingFeeVnd": 0,
+    "totalVnd": 283000,
+    "voucherCode": "FREESHIP",
+    "paymentMethod": "card",
+    "status": "DELIVERED",
+    "deliveryAddress": "88 Phan Xích Long, P.2, Q. Phú Nhuận, TP.HCM",
+    "deliveryPhone": "0987***321",
+    "upsellAccepted": true,
+    "createdAt": "2026-07-11T19:20:00.000Z",
+    "updatedAt": "2026-07-11T20:05:00.000Z"
+  },
+  {
+    "id": "KFC-0004",
+    "psid": "24081573210004",
+    "items": [
+      { "itemId": "com-ga-ran", "quantity": 1 },
+      { "itemId": "pepsi-vua", "quantity": 1 }
+    ],
+    "subtotalVnd": 60000,
+    "discountVnd": 0,
+    "shippingFeeVnd": 15000,
+    "totalVnd": 75000,
+    "voucherCode": null,
+    "paymentMethod": "cod",
+    "status": "DELIVERING",
+    "deliveryAddress": "234 Cách Mạng Tháng 8, P.10, Q.3, TP.HCM",
+    "deliveryPhone": "0938***147",
+    "upsellAccepted": false,
+    "createdAt": "2026-07-11T18:30:00.000Z",
+    "updatedAt": "2026-07-11T18:55:00.000Z"
+  },
+  {
+    "id": "KFC-0005",
+    "psid": "24081573210005",
+    "items": [{ "itemId": "ga-pop-corn", "quantity": 2 }],
+    "subtotalVnd": 78000,
+    "discountVnd": 0,
+    "shippingFeeVnd": 15000,
+    "totalVnd": 93000,
+    "voucherCode": null,
+    "paymentMethod": "cod",
+    "status": "PLACED",
+    "deliveryAddress": "12 Nguyễn Huệ, P. Bến Nghé, Q.1, TP.HCM",
+    "deliveryPhone": "0909***555",
+    "upsellAccepted": true,
+    "createdAt": "2026-07-11T20:10:00.000Z",
+    "updatedAt": "2026-07-11T20:11:00.000Z"
+  }
+]

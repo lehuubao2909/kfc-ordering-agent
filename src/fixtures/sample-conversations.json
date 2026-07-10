@@ -1,0 +1,49 @@
+[
+  {
+    "psid": "24081573210001",
+    "customerName": "Nguyễn Văn A",
+    "state": "PREPARING",
+    "mode": "agent",
+    "activeOrderId": "KFC-0001",
+    "updatedAt": "2026-07-11T11:47:00.000Z",
+    "history": [
+      { "role": "user", "content": "cho mình combo gà rán 1 người với 2 miếng gà giòn cay" },
+      { "role": "assistant", "content": "Dạ em chốt combo gà rán 1 người + 2 miếng gà giòn cay nhé. Trưa nay nhiều anh chị gọi kèm Pepsi lớn cho đã, anh/chị thêm 1 lon không ạ?" },
+      { "role": "user", "content": "ok thêm 1 pepsi lớn" },
+      { "role": "assistant", "content": "Dạ rồi ạ. Em có mã KFC20 giảm 20.000đ áp được cho đơn này. Em đọc lại đơn: 1 combo gà rán 1 người, 2 gà giòn cay, 1 Pepsi lớn — tổng sau giảm 174.000đ (đã gồm ship). Anh/chị xác nhận giúp em nhé?" },
+      { "role": "user", "content": "ừ đúng rồi" },
+      { "role": "assistant", "content": "Anh/chị cho em xin địa chỉ giao và số điện thoại ạ." },
+      { "role": "user", "content": "123 Nguyễn Trãi P2 Q5, 0901234567" },
+      { "role": "assistant", "content": "Dạ. Anh/chị thanh toán tiền mặt khi nhận hay chuyển khoản QR ạ?" },
+      { "role": "user", "content": "tiền mặt" },
+      { "role": "assistant", "content": "✅ Đơn KFC-0001 đã xác nhận! Tổng 174.000đ, dự kiến giao 30–40 phút ạ. Cảm ơn anh/chị đã đặt KFC ❤️" }
+    ]
+  },
+  {
+    "psid": "24081573210006",
+    "customerName": "Trần Thị B",
+    "state": "BROWSING",
+    "mode": "human",
+    "activeOrderId": null,
+    "updatedAt": "2026-07-11T20:15:00.000Z",
+    "history": [
+      { "role": "user", "content": "gà bên em có phải gà công nghiệp không, nuôi ở đâu vậy?" },
+      { "role": "assistant", "content": "Dạ câu này để em chuyển anh/chị qua nhân viên tư vấn hỗ trợ kỹ hơn ạ, chờ em chút nhé." },
+      { "role": "system", "content": "→ Đã chuyển hội thoại cho nhân viên (handoff)" }
+    ]
+  },
+  {
+    "psid": "24081573210005",
+    "customerName": "Lê Văn C",
+    "state": "PLACED",
+    "mode": "agent",
+    "activeOrderId": "KFC-0005",
+    "updatedAt": "2026-07-11T20:11:00.000Z",
+    "history": [
+      { "role": "user", "content": "2 phần gà popcorn giao 12 Nguyễn Huệ Q1 sđt 0909000555 trả tiền mặt" },
+      { "role": "assistant", "content": "Dạ 2 phần gà popcorn nhé. Thêm 1 Pepsi cho đỡ khát không ạ? Nếu không em chốt luôn ạ." },
+      { "role": "user", "content": "thôi chốt đi" },
+      { "role": "assistant", "content": "✅ Đơn KFC-0005 đã xác nhận! Tổng 93.000đ, giao về 12 Nguyễn Huệ Q1, dự kiến 30–40 phút ạ." }
+    ]
+  }
+]

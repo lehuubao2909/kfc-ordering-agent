@@ -30,6 +30,13 @@ CANCELLED: được phép từ AWAITING_PAYMENT, PLACED. Từ PREPARING trở đ
 
 FE (Dev C) CHỈ gọi các route trên. Agent tools (Dev B) KHÔNG gọi HTTP — import service functions trực tiếp.
 
+**Dev C build trên fixtures trước** (khớp shape response, import trực tiếp, đổi sang fetch API thật khi Dev A xong):
+- `src/fixtures/menu-sample.json` → GET /api/menu (`data`)
+- `src/fixtures/sample-orders.json` → GET /api/admin/orders (`data.orders`) + tracking /order/[id] + /pay/[orderId]
+- `src/fixtures/sample-conversations.json` → GET /api/admin/conversations (`data`)
+- `src/fixtures/sample-admin-metrics.json` → GET /api/admin/orders (`data.metrics`) — 4 card admin
+- Chi tiết bảng/cột: [database-schema.md](database-schema.md)
+
 ## Agent tools (Dev B) → service functions (Dev A)
 
 | Tool | Gọi service |

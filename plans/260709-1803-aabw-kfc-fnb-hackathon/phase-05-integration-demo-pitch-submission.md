@@ -43,6 +43,7 @@
 6. "Ngoài 24h window Messenger cấm nhắn?" → Đã dùng POST_PURCHASE_UPDATE tag đúng policy cho order update.
 7. "Chi phí LLM/đơn?" → ~X đ/hội thoại (điền số từ eval run); rẻ hơn nhiều phút nhân viên.
 8. "Zalo đâu?" → Cùng agent core, chỉ thêm adapter webhook; Messenger thật đã chứng minh pattern.
+9. "Next.js làm backend — production/scale được không?" → Next chỉ là vỏ HTTP; lõi là module TS thuần stateless, state trong Postgres. Tải chat 250 cửa hàng (vài chục event/s giờ đỉnh) serverless scale ngang tự động; bottleneck thật là LLM rate limit + DB connection (đã có queue + pooling, không phụ thuộc framework). Cần vào hạ tầng KFC (Azure) → đóng container, thay lớp route mỏng ~1 ngày, services không đổi dòng nào.
 
 ## Todo List
 
