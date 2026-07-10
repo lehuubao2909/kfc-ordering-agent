@@ -1,0 +1,54 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import type { MockConversation, MockOrder, TranscriptMessage } from "@/lib/mock/mock-data-types";
+import type { OrderState } from "@/lib/types";
+import { ConversationList } from "./conversation-list";
+import { TranscriptViewer } from "./transcript-viewer";
+import { OrderStatusAdvancePanel } from "./order-status-advance-panel";
+
+type StaffTab = "conversations" | "orders";
+
+export function StaffConsole({ initialConversations, initialOrders }: { initialConversations: MockConversation[]; initialOrders: MockOrder[] }) {
+  const [tab, setTab] = useState<StaffTab>("conversations");
+  const [conversations, setConversations] = useState(initialConversations);
+  const [orders, setOrders] = useState(initialOrders);
+  const [selectedPsid, setSelectedPsid] = useState(initialConversations[0]?.psid ?? "");
+  const [notice, setNotice] = useState("");
+  const selected = conversations.find((item) => item.psid === selectedPsid) ?? conversations[0];
+  const liveOrderCount = orders.filter((order) => ["PLACED", "PREPARING", "DELIVERING"].includes(order.status)).length;
+
+  function toggleMode() {
+    if (!selected) return;
+    const nextMode = selected.mode === "agent" ? "human" : "agent";
+    setConversations((current) => current.map((item) => item.psid === selected.psid ? { ...item, mode: nextMode, history: [...item.history, { role: "system", content: nextMode === "human" ? "→ Nhân viên tiếp quản hội thoại" : "→ Đã bàn giao lại cho AI Chăm sóc" }] } : item));
+    setNotice(nextMode === "human" ? "Bạn đã tiếp quản cuộc trò chuyện trực tiếp." : "Đã kích hoạt lại Trợ lý AI.");
+  }
+
+  function sendMessage(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!selected) return;
+    const form = event.currentTarget;
+    const text = String(new FormData(form).get("message") ?? "").trim();
+    if (!text) return;
+    const message: TranscriptMessage = { role: "assistant", content: text };
+    setConversations((current) => current.map((item) => item.psid === selected.psid ? { ...item, history: [...item.history, message], updatedAt: new Date().toISOString() } : item));
+    form.reset();
+    setNotice("Đã gửi phản hồi thành công.");
+  }
+
+  function advanceOrder(id: string, status: OrderState) {
+    setOrders((current) => current.map((order) => order.id === id ? { ...order, status, updatedAt: new Date().toISOString() } : order));
+    setNotice(`Đơn hàng ${id} đã cập nhật trạng thái mới.`);
+  }
+
+  if (!selected) return <div className="premium-card rounded-2xl p-8 text-center text-sm text-zinc-500">Chưa có hội thoại nào cần xử lý.</div>;
+
+  return <div className="relative"><div className="mb-4 grid grid-cols-2 gap-1 rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-sm" role="tablist" aria-label="Khu vực Staff Console"><button id="conversations-tab" type="button" role="tab" aria-selected={tab === "conversations"} aria-controls="conversations-panel" onClick={() => setTab("conversations")} className={`rounded-xl px-3 py-3 text-sm font-black focus-visible:ring-2 focus-visible:ring-red-600 ${tab === "conversations" ? "bg-zinc-950 text-white shadow-sm" : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"}`}>Tin nhắn / Chat <span className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] ${tab === "conversations" ? "bg-white/15" : "bg-zinc-200"}`}>{conversations.length}</span></button><button id="orders-tab" type="button" role="tab" aria-selected={tab === "orders"} aria-controls="orders-panel" onClick={() => setTab("orders")} className={`rounded-xl px-3 py-3 text-sm font-black focus-visible:ring-2 focus-visible:ring-red-600 ${tab === "orders" ? "bg-zinc-950 text-white shadow-sm" : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-950"}`}>Quản lý đơn hàng <span className={`ml-1 rounded-full px-1.5 py-0.5 text-[10px] ${tab === "orders" ? "bg-white/15" : "bg-red-100 text-red-700"}`}>{liveOrderCount}</span></button></div>
+
+    <AnimatePresence mode="wait" initial={false}>{tab === "conversations" ? <motion.section key="conversations" id="conversations-panel" role="tabpanel" aria-labelledby="conversations-tab" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} transition={{ duration: 0.2 }} className="premium-card overflow-hidden rounded-2xl"><div className="grid lg:min-h-[650px] lg:grid-cols-[300px_1fr]"><ConversationList conversations={conversations} selectedPsid={selected.psid} onSelect={setSelectedPsid} /><div className="flex min-h-0 flex-col"><header className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200/80 bg-white/80 px-4 py-4 sm:px-6"><div className="min-w-0"><div className="flex items-center gap-2"><h2 className="truncate font-black">{selected.customerName}</h2><span className={`rounded-full px-2 py-0.5 text-[10px] font-black uppercase ${selected.mode === "human" ? "bg-amber-100 text-amber-800" : "bg-blue-50 text-blue-700"}`}>{selected.mode === "human" ? "Nhân viên trực" : "Trợ lý AI"}</span></div><p className="truncate text-xs text-zinc-400">PSID <span translate="no">••••{selected.psid.slice(-4)}</span>{selected.activeOrderId ? ` · ${selected.activeOrderId}` : ""}</p></div><motion.button whileTap={{ scale: 0.96 }} type="button" onClick={toggleMode} className={`rounded-xl px-4 py-2.5 text-xs font-black shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2 max-[420px]:w-full ${selected.mode === "human" ? "bg-zinc-900 text-white hover:bg-zinc-700 focus-visible:ring-zinc-900" : "bg-red-700 text-white hover:bg-red-600 focus-visible:ring-red-700"}`}>{selected.mode === "human" ? "Bàn giao cho AI" : "Tiếp quản chat"}</motion.button></header><TranscriptViewer conversation={selected} /><form onSubmit={sendMessage} className="border-t border-zinc-200 bg-white p-3 sm:p-4"><label htmlFor="staff-message" className="sr-only">Tin nhắn trả lời khách hàng</label><div className="flex gap-2 rounded-2xl bg-zinc-100 p-1.5 focus-within:ring-2 focus-within:ring-red-100"><input id="staff-message" name="message" autoComplete="off" placeholder={selected.mode === "human" ? "Nhập nội dung tin nhắn..." : "Tiếp quản cuộc trò chuyện để phản hồi..."} disabled={selected.mode !== "human"} className="min-w-0 flex-1 rounded-xl border-0 bg-white px-3 py-3 text-sm shadow-sm disabled:cursor-not-allowed disabled:bg-zinc-100 focus-visible:ring-2 focus-visible:ring-red-500 sm:px-4" /><motion.button whileTap={{ scale: 0.94 }} disabled={selected.mode !== "human"} className="shrink-0 rounded-xl bg-red-700 px-4 py-3 text-sm font-black text-white hover:bg-red-600 focus-visible:ring-2 focus-visible:ring-red-700 disabled:cursor-not-allowed disabled:bg-zinc-300 sm:px-5">Gửi tin</motion.button></div></form></div></div></motion.section> : <motion.div key="orders" id="orders-panel" role="tabpanel" aria-labelledby="orders-tab" initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: 0.2 }}><OrderStatusAdvancePanel orders={orders} onAdvance={advanceOrder} /></motion.div>}</AnimatePresence>
+
+    <AnimatePresence mode="wait">{notice ? <motion.div key={notice} initial={{ opacity: 0, y: 12, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 6 }} className="fixed inset-x-4 bottom-4 z-50 rounded-xl bg-zinc-950 px-4 py-3 text-sm font-semibold text-white shadow-2xl sm:left-auto sm:right-5 sm:max-w-sm" role="status">✓ {notice}</motion.div> : null}</AnimatePresence>
+  </div>;
+}
