@@ -4,6 +4,7 @@
  * → trang /pay bấm "Tôi đã thanh toán (demo)" → confirmPayment → PLACED + event push.
  * Roadmap slide: VNPay/MoMo/ZaloPay là webhook chuẩn thay hàm confirm này.
  */
+import { advanceOrderStatus, getOrderById, OrderTransitionError } from "./order-service";
 
 // TODO(Dev A): trả URL trang thanh toán cho agent gửi khách
 export function getPaymentLink(orderId: string): string {
@@ -11,7 +12,13 @@ export function getPaymentLink(orderId: string): string {
   return `${base}/pay/${orderId}`;
 }
 
-// TODO(Dev A): verify order đang AWAITING_PAYMENT → advanceOrderStatus(PLACED)
-export async function confirmPayment(_orderId: string): Promise<void> {
-  throw new Error("TODO(Dev A): confirmPayment");
+// Verify order đang AWAITING_PAYMENT → advanceOrderStatus(PLACED) → event push.
+export async function confirmPayment(orderId: string): Promise<void> {
+  const order = await getOrderById(orderId);
+  if (!order) throw new OrderTransitionError(`Không tìm thấy đơn ${orderId}.`);
+  if (order.status !== "AWAITING_PAYMENT") {
+    if (order.status === "PLACED") return; // đã thanh toán rồi (double-confirm) — idempotent
+    throw new OrderTransitionError(`Đơn ${orderId} không ở trạng thái chờ thanh toán ạ.`);
+  }
+  await advanceOrderStatus(orderId, "PLACED");
 }
