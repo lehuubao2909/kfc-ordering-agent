@@ -11,6 +11,7 @@ import {
   timestamp,
   jsonb,
   serial,
+  index,
 } from "drizzle-orm/pg-core";
 
 // Menu: 1 bảng duy nhất, combo phân biệt bằng category + comboItemIds (KISS)
@@ -63,7 +64,9 @@ export const sessions = pgTable("sessions", {
   history: jsonb("history").$type<{ role: string; content: string }[]>().notNull().default([]),
   processingUntil: timestamp("processing_until"), // lock: đang xử lý tới thời điểm này, steal sau 60s
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (t) => [
+  index("sessions_updated_idx").on(t.updatedAt.desc()), // listConversations
+]);
 
 export const orders = pgTable("orders", {
   id: text("id").primaryKey(), // "KFC-0001"
@@ -81,7 +84,11 @@ export const orders = pgTable("orders", {
   upsellAccepted: boolean("upsell_accepted").notNull().default(false), // metric cho admin
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+}, (t) => [
+  index("orders_psid_created_idx").on(t.psid, t.createdAt.desc()), // getActiveOrderByPsid
+  index("orders_created_idx").on(t.createdAt.desc()),              // admin polling ORDER BY createdAt
+  index("orders_status_idx").on(t.status),                        // funnel filter
+]);
 
 export const loyaltyAccounts = pgTable("loyalty_accounts", {
   phone: text("phone").primaryKey(),
@@ -105,4 +112,6 @@ export const messageLog = pgTable("message_log", {
   text: text("text").notNull(),
   processed: boolean("processed").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (t) => [
+  index("message_log_psid_created_idx").on(t.psid, t.createdAt), // getTranscript theo psid
+]);

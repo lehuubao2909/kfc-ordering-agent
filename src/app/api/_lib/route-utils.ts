@@ -65,3 +65,10 @@ export function maskPhone(phone: string | null): string | null {
   if (!phone) return phone;
   return phone.length >= 7 ? `${phone.slice(0, 3)}***${phone.slice(-4)}` : "***";
 }
+
+/** Che địa chỉ cho endpoint công khai (id đơn đoán được): ẩn số nhà/đường, giữ phường/quận/tp. */
+export function maskAddress(address: string | null): string | null {
+  if (!address) return address;
+  const parts = address.split(",").map((s) => s.trim()).filter(Boolean);
+  return parts.length <= 1 ? "•••" : `•••, ${parts.slice(1).join(", ")}`;
+}

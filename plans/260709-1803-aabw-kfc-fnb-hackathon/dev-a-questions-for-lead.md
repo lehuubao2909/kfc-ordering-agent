@@ -25,6 +25,15 @@
 5. `/conversations/send` phải **import `sendTextMessage` từ `messenger-adapter.ts` (đất Dev B)** — import chéo vậy đúng luật ownership chứ?
 6. `/api/admin/**` (gồm conversations) dùng chung env auth nào? Xác nhận tên: `ADMIN_BASIC_AUTH`?
 
+## DB — đã làm & cần quyết (10/7)
+- ✅ **Đã thêm index** (không đổi types/contract, đã `db:push` + verify trên Neon): `orders(psid,createdAt)`, `orders(createdAt)`, `orders(status)`, `message_log(psid,createdAt)`, `sessions(updatedAt)` — phục vụ tracking (getActiveOrderByPsid) + admin polling 2s + staff transcript.
+- ❓ **Bảng mới `order_status_events`?** (orderId, from, to, at) — audit trail chuyển trạng thái. Cần **NẾU** trang tracking `/order/[id]` (Dev C) muốn timeline có **timestamp thật từng bước**; không cần nếu chỉ hiện bước hiện tại. Là schema change → chờ Lead + Dev C quyết. Nếu duyệt, em ghi thêm trong `advanceOrderStatus`.
+- ⚠️ **Transaction atomicity:** `createOrderFromSession` chạy 3 câu lệnh rời (insert order → set activeOrderId → set state); driver `neon-http` stateless không bọc transaction → lỗi giữa chừng có thể để state lệch. Muốn chặt: đổi sang `neon` pooled + `db.transaction()`. Rủi ro demo thấp — anh quyết có làm không (đổi driver đụng `db/client.ts`).
+- ⚠️ **Chưa có Foreign Key** (orders.psid, sessions.activeOrderId, message_log.psid). Demo chấp nhận; thêm FK làm seed/reset phải đúng thứ tự — anh quyết.
+
+## Route MỚI cần thêm vào api-contract.md
+- **`GET /api/orders/:id`** — trang `/order` (tracking) & `/pay` (Dev C) cần đọc 1 đơn qua HTTP; contract cũ **thiếu hẳn** route này → 2 trang critical-path không có nguồn dữ liệu. Đã build (đất Dev A). Trả `order` với `deliveryPhone`/`deliveryAddress` **đã mask** (id đơn đoán được, chống dò lộ PII). Không cần auth (chỉ đọc, đã mask). Anh thêm 1 dòng vào `api-contract.md` để Dev C biết route + shape.
+
 ## Contract payment/confirm đổi (do vá bảo mật)
 - Đã thêm **payment token (HMAC)** chống confirm bằng id đoán mò. Route `POST /api/payment/confirm` giờ nhận `{orderId, token}` (thêm `token`). Link `/pay` do `getPaymentLink` sinh đã kèm `?t=<token>`.
 - Cần: **(1)** Dev C đọc `?t=` từ URL trang `/pay` và gửi kèm khi POST confirm; **(2)** Lead cập nhật `api-contract.md`; **(3)** set env `PAYMENT_TOKEN_SECRET` (chưa có sẽ fallback `META_APP_SECRET`).
