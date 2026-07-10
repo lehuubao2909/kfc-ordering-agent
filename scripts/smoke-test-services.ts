@@ -9,7 +9,8 @@ import { eq } from "drizzle-orm";
 import { db } from "../src/lib/db/client";
 import { orders, sessions, customers, loyaltyAccounts } from "../src/lib/db/schema";
 import { addToCart, getCart, clearCart } from "../src/lib/services/cart-service";
-import { calculateOrderTotals, createOrderFromSession, advanceOrderStatus, cancelOrder } from "../src/lib/services/order-service";
+import { calculateOrderTotals, createOrderFromSession, advanceOrderStatus, cancelOrder, getOrderById } from "../src/lib/services/order-service";
+import { getPaymentLink, verifyPaymentToken, confirmPayment } from "../src/lib/services/payment-mock-service";
 import { autoApplyBestVoucher } from "../src/lib/services/promotion-voucher-service";
 import { getUpsellSuggestions } from "../src/lib/services/upsell-recommendation-service";
 import { getLoyaltyPoints } from "../src/lib/services/loyalty-service";
@@ -89,6 +90,20 @@ async function main() {
   const order2 = await createOrderFromSession(PSID, "cod");
   const cancelled = await cancelOrder(order2.id);
   check("PLACED → CANCELLED", cancelled.status === "CANCELLED");
+
+  console.log("\n9) Thanh toán QR + payment token");
+  await clearCart(PSID);
+  await addToCart(PSID, { itemId: "burger-zinger", quantity: 1 });
+  const qrOrder = await createOrderFromSession(PSID, "qr");
+  check("QR → AWAITING_PAYMENT", qrOrder.status === "AWAITING_PAYMENT");
+  const link = getPaymentLink(qrOrder.id);
+  const token = new URL(link).searchParams.get("t") ?? "";
+  check("link /pay có token", token.length > 0, `(t=${token.slice(0, 8)}…)`);
+  check("verify token đúng → pass", verifyPaymentToken(qrOrder.id, token));
+  check("verify token sai → từ chối", !verifyPaymentToken(qrOrder.id, "token-gia"));
+  await confirmPayment(qrOrder.id);
+  const paid = await getOrderById(qrOrder.id);
+  check("confirmPayment → PLACED", paid?.status === "PLACED");
 
   await cleanup();
   console.log(`\n=== KẾT QUẢ: ${pass} pass / ${fail} fail ===`);

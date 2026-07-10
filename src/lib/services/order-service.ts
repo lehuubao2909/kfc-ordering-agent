@@ -3,7 +3,7 @@
  * Mọi transition trạng thái đơn đi qua đây. LLM/route KHÔNG tự đổi state.
  * Transition sai → throw OrderTransitionError với message tiếng Việt để agent relay cho khách.
  */
-import { count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { orders } from "@/lib/db/schema";
 import { Cart, Order, OrderSchema, OrderState, PaymentMethod } from "@/lib/types";
@@ -108,27 +108,35 @@ export async function createOrderFromSession(psid: string, paymentMethod: Paymen
 
   const totals = await computeTotals(cart);
   const status: OrderState = paymentMethod === "cod" ? "PLACED" : "AWAITING_PAYMENT";
-  const id = await generateOrderId();
 
-  const [row] = await db
-    .insert(orders)
-    .values({
-      id,
-      psid,
-      items: cart.items,
-      subtotalVnd: totals.subtotalVnd,
-      discountVnd: totals.discountVnd,
-      shippingFeeVnd: totals.shippingFeeVnd,
-      totalVnd: totals.totalVnd,
-      voucherCode: totals.voucherCode,
-      paymentMethod,
-      status,
-      deliveryAddress: customer.lastAddress,
-      deliveryPhone: customer.phone,
-    })
-    .returning();
+  // Retry-on-conflict: 2 khách đặt cùng lúc có thể sinh trùng id → insert onConflictDoNothing,
+  // trùng thì đọc lại count sinh id mới, thử tối đa 5 lần. Chống race, giữ mã đẹp KFC-xxxx.
+  let row: typeof orders.$inferSelect | undefined;
+  for (let attempt = 0; attempt < 5 && !row; attempt++) {
+    const id = await generateOrderId();
+    const inserted = await db
+      .insert(orders)
+      .values({
+        id,
+        psid,
+        items: cart.items,
+        subtotalVnd: totals.subtotalVnd,
+        discountVnd: totals.discountVnd,
+        shippingFeeVnd: totals.shippingFeeVnd,
+        totalVnd: totals.totalVnd,
+        voucherCode: totals.voucherCode,
+        paymentMethod,
+        status,
+        deliveryAddress: customer.lastAddress,
+        deliveryPhone: customer.phone,
+      })
+      .onConflictDoNothing()
+      .returning();
+    row = inserted[0];
+  }
+  if (!row) throw new OrderTransitionError("Hệ thống đang bận, chưa tạo được đơn. Anh/chị thử lại giúp em nhé.");
 
-  await setSessionActiveOrder(psid, id);
+  await setSessionActiveOrder(psid, row.id);
   await setSessionState(psid, status);
 
   const order = rowToOrder(row);
@@ -145,11 +153,14 @@ export async function advanceOrderStatus(orderId: string, to: OrderState): Promi
     throw new OrderTransitionError(`Đơn ${orderId} đang "${current.status}", không thể chuyển sang "${to}".`);
   }
 
+  // Optimistic guard: chỉ update nếu status VẪN đúng như lúc đọc (chống double-transition TOCTOU
+  // khi 2 lệnh advance chạy song song). Nếu ai đó vừa đổi trước → 0 row → báo lỗi thay vì nhảy 2 bước.
   const [row] = await db
     .update(orders)
     .set({ status: to, updatedAt: new Date() })
-    .where(eq(orders.id, orderId))
+    .where(and(eq(orders.id, orderId), eq(orders.status, current.status)))
     .returning();
+  if (!row) throw new OrderTransitionError(`Trạng thái đơn ${orderId} vừa thay đổi, anh/chị thử lại giúp em nhé.`);
   const order = rowToOrder(row);
 
   if (to === "DELIVERED" && order.deliveryPhone) {

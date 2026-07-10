@@ -25,6 +25,10 @@
 5. `/conversations/send` phải **import `sendTextMessage` từ `messenger-adapter.ts` (đất Dev B)** — import chéo vậy đúng luật ownership chứ?
 6. `/api/admin/**` (gồm conversations) dùng chung env auth nào? Xác nhận tên: `ADMIN_BASIC_AUTH`?
 
+## Contract payment/confirm đổi (do vá bảo mật)
+- Đã thêm **payment token (HMAC)** chống confirm bằng id đoán mò. Route `POST /api/payment/confirm` giờ nhận `{orderId, token}` (thêm `token`). Link `/pay` do `getPaymentLink` sinh đã kèm `?t=<token>`.
+- Cần: **(1)** Dev C đọc `?t=` từ URL trang `/pay` và gửi kèm khi POST confirm; **(2)** Lead cập nhật `api-contract.md`; **(3)** set env `PAYMENT_TOKEN_SECRET` (chưa có sẽ fallback `META_APP_SECRET`).
+
 ## Contract nhỏ (khỏi lệch lúc tích hợp)
 7. contract:24 = `POST /api/admin/orders/advance` (body `{orderId,to}`), nhưng phase-02/04 viết `/api/admin/orders/:id/advance` (path param). Skeleton hiện theo **contract** (`/advance` + body). Chốt Dev C gọi kiểu body nhé?
 
