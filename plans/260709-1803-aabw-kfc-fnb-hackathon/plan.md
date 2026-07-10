@@ -35,27 +35,37 @@ Round 1 (3'): video nén 90". Round 2 (7'): live, giám khảo tự đặt trên
 
 | Phase | Thời gian | Người | Status |
 |---|---|---|---|
-| [01 — Unblock & Foundation](phase-01-unblock-and-foundation.md) | Hôm nay 10/7 + đêm | Cả 4 | 🟡 In progress |
-| [02 — Core Services & Data](phase-02-core-services-and-data.md) | 11/7 sáng→tối | Người 1 (+4) | ⬜ |
-| [03 — Agent + Messenger](phase-03-conversational-agent-messenger.md) | 11/7 sáng→tối | Người 2 | ⬜ |
-| [04 — Staff Console, Admin, Tracking & Pay](phase-04-staff-console-admin-tracking-frontend.md) | 11/7 sáng→tối | Người 3 | ⬜ |
-| [05 — Integration, Pitch & Submission](phase-05-integration-demo-pitch-submission.md) | Đêm 11/7 → 8:30 sáng 12/7 | Cả 4 | ⬜ |
+| [01 — Unblock & Foundation](phase-01-unblock-and-foundation.md) | Hôm nay 10/7 + đêm | Cả 4 | 🟡 Scaffold ✅ (build pass) · webhook config đang làm (Lead) · còn: model test, seed mở rộng, đọc docs |
+| [02 — Core Services & Data](phase-02-core-services-and-data.md) | 11/7 sáng→tối | Dev A | ⬜ Chữ ký hàm + schema sẵn, grep TODO(Dev A) |
+| [03 — Agent + Messenger](phase-03-conversational-agent-messenger.md) | 11/7 sáng→tối | Dev B | ⬜ Prompt + tools map + adapter sẵn, grep TODO(Dev B) |
+| [04 — Staff Console, Admin, Tracking & Pay](phase-04-staff-console-admin-tracking-frontend.md) | 11/7 sáng→tối | Dev C | ⬜ 5 trang skeleton sẵn, grep TODO(Dev C) |
+| [05 — Integration, Pitch & Submission](phase-05-integration-demo-pitch-submission.md) | Đêm 11/7 → 8:30 sáng 12/7 | Cả 4 (Lead điều phối) | ⬜ |
 
 ## Mốc cứng & Gates
 
 - **Gate 2 (trưa 10/7 — SỐNG CÒN):** webhook Messenger echo OK trên production URL. Fail không cứu được → họp khẩn, Plan B quay về P2.
 - **Gate 3 (tối 10/7):** chọn `OPENAI_MODEL` qua 10 câu transcript. · **M1 (trưa 11/7):** đặt đơn end-to-end COD qua Messenger. · **M2 (15:00):** payment + tracking + push đủ. · **M3 (19:00):** staff console + admin đủ. · **Gate 4 (22:00 11/7): FEATURE FREEZE.** · **8:00–8:30 sáng 12/7: NỘP.**
 
-## Phân công (ownership theo thư mục — chỉ chủ sở hữu được sửa)
+## Phân công (CHỐT 10/7 — ownership theo thư mục, chỉ chủ sở hữu được sửa)
 
-| Ai | Sở hữu |
-|---|---|
-| Người 1 | `src/lib/services/**`, `src/lib/types.ts`, DB schema, `src/app/api/**` (trừ webhooks), scaffold + contract |
-| Người 2 | `src/lib/agent/**`, `src/lib/channels/**`, `src/app/api/webhooks/**`, CLI eval harness |
-| Người 3 | `src/app/(staff|admin|order|pay)/**`, `src/components/**`, landing QR |
-| Người 4 | `scripts/**`, seed data, backtest số liệu, slides 3'/7', video, kịch bản demo, QA "độc ác" từ chiều 11/7 |
+**Việc chỉ LEAD (bạn) làm — không chia:**
+- Meta App + webhook config + tokens + Vercel env/deploy (✅ đang làm)
+- Scaffold + `src/lib/types.ts` + `docs/api-contract.md` — mọi thay đổi contract/schema phải qua Lead (✅ scaffold xong 10/7, build pass)
+- Review, merge, fix conflict — main luôn deploy được
+- Integration QA: chạy kịch bản demo trên production từ chiều 11/7, phân loại bug "chặn/không chặn kịch bản"
+- `scripts/reset-demo-data.ts`, nộp portal, điều phối pitch + hỏi KFC tại Kick-Off
 
-Sync points (ngoài ra không họp): ① tối 10/7 review scaffold + contract (15') ② 15:00 11/7 integration check (30') ③ 22:00 freeze + chạy kịch bản ×5 ④ 6:30 sáng 12/7 rehearsal.
+**Chia độc lập cho 3 dev** (grep `TODO(Dev X)` trong code là ra hết việc, chữ ký hàm đã viết sẵn):
+
+| Ai | Module sở hữu | Việc chính 11/7 |
+|---|---|---|
+| **Dev A — Services & Data** | `src/lib/services/**`, `src/lib/db/**`, `src/app/api/**` (trừ webhooks), scripts seed/POS/co-occurrence | Sáng: cart + order state machine + voucher/loyalty. Chiều: upsell engine + payment + admin API. Kèm: mở rộng menu ~60 món + mock POS |
+| **Dev B — Agent & Channels** | `src/lib/agent/**`, `src/lib/channels/**`, `src/app/api/webhooks/**`, eval harness | Sáng: agent core + 14 tools + session/lock/queue, eval ≥18/20. Chiều: carousel/quick replies/receipt + status push + handoff |
+| **Dev C — Frontend** | `src/app/**` pages, `src/components/**` | Sáng: /pay + /order (critical path). Chiều: /staff (takeover + advance status) + /admin 4 cards + landing QR. Tối: polish + video demo cùng Lead |
+
+**Việc CẢ 4 cùng làm** (ngoài ra không họp): ① tối 10/7 — đọc docs 10' + review scaffold 15' ② 15:00 11/7 — integration check 30' (đặc biệt luồng staff advance → push) ③ 22:00 11/7 — freeze + chạy kịch bản ×5 ④ 6:30 sáng 12/7 — rehearsal pitch.
+
+> Phase files viết trước khi chốt vai trò dùng tên cũ — remap: Người 1→Dev A, Người 2→Dev B, Người 3→Dev C, Người 4→(data → Dev A, pitch/QA/demo → Lead).
 
 ## Stack (chốt)
 
