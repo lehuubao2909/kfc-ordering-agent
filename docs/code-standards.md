@@ -20,11 +20,15 @@
 - Secrets chỉ ở env. Không log SĐT đầy đủ (mask `090***4567`).
 - LLM không bao giờ là nguồn của giá/tên món — chỉ từ tool results.
 
-## Git
-- Làm thẳng trên `main`, commit nhỏ + pull thường xuyên (folder ownership đã chống conflict).
+## Git — branch-per-dev, Lead merge vào main
+- **Mỗi dev làm trên nhánh riêng**: `dev-a` / `dev-b` / `dev-c`. KHÔNG push thẳng `main`.
+- `main` auto-deploy Vercel production (= URL webhook Messenger thật) → phải luôn xanh, chỉ Lead merge.
+- Flow: commit nhỏ → push nhánh mình → mở PR vào `main`. Lead check build pass → merge nhanh.
+- Sau khi Lead merge: các dev `git pull origin main` vào nhánh mình (đặc biệt Dev B pull khi Dev A merge services).
+- Mỗi branch/PR có **Preview URL Vercel riêng** để test phần mình, không đụng production.
+- Test webhook Messenger thật: chỉ 1 người 1 thời điểm (trỏ Meta sang Preview URL của mình, xong trỏ lại). Thống nhất trước trong team.
 - Conventional commits: `feat:`, `fix:`, `chore:`. Không nhắc AI trong commit message.
-- **Trước khi push: `npm run build` phải pass.** Push code đỏ = cả team đứng hình.
-- Conflict → dừng, nhắn Lead xử lý. Không tự force-push.
+- **Trước khi push: `npm run build` phải pass.** Conflict → nhắn Lead. Không force-push.
 
 ## Chạy dự án
 ```bash
