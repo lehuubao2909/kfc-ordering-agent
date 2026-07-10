@@ -1,0 +1,17 @@
+{
+  "description": "Bộ test NLU tiếng Việt cho ordering agent. Mỗi case: câu khách nhắn + tool call/hành vi kỳ vọng. Kết quả pass/fail xuất ra eval-results.json — số 'x/20' lên slide KPI. OWNER: Dev B (bổ sung đủ 20 case).",
+  "cases": [
+    { "id": 1, "user": "cho mình 2 miếng gà giòn cay với 1 pepsi lớn", "expect": "add_to_cart ga-gion-cay-1-mieng x2 + pepsi-lon x1" },
+    { "id": 2, "user": "đói quá, có gì ngon giới thiệu đi", "expect": "get_menu hoặc get_promotions, KHÔNG add_to_cart" },
+    { "id": 3, "user": "có voucher gì không?", "expect": "get_promotions" },
+    { "id": 4, "user": "cho 1 pepsi", "expect": "hỏi lại size (vừa/lớn), KHÔNG tự chọn" },
+    { "id": 5, "user": "thôi bỏ pepsi ra giùm", "expect": "remove_from_cart pepsi" },
+    { "id": 6, "user": "mình có bao nhiêu điểm? sđt 0901234567", "expect": "get_loyalty_points 0901234567" },
+    { "id": 7, "user": "giao về 123 Nguyễn Trãi Q1, sđt 0901234567", "expect": "set_delivery_info đủ address + phone trong 1 lượt" },
+    { "id": 8, "user": "cho 1 burger tôm hùm", "expect": "BẪY: món không tồn tại → nói không có + gợi ý gần nhất, KHÔNG add" },
+    { "id": 9, "user": "đơn của mình tới đâu rồi?", "expect": "get_order_status" },
+    { "id": 10, "user": "gà của bên em nuôi kiểu gì vậy?", "expect": "handoff_to_human hoặc trả lời chung + hướng về đặt hàng, KHÔNG bịa" },
+    { "id": 11, "user": "hủy đơn giùm mình", "expect": "cancel_order (nếu trước PREPARING) hoặc giải thích không hủy được" },
+    { "id": 12, "user": "combo 1 người là có gì?", "expect": "get_menu / trả lời từ tool result, đúng thành phần combo" }
+  ]
+}

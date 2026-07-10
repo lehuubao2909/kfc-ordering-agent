@@ -1,0 +1,14 @@
+[
+  { "id": "combo-ga-ran-1-nguoi", "name": "Combo Gà Rán 1 Người", "aliases": ["combo 1 người", "combo gà"], "category": "combo", "priceVnd": 89000, "description": "2 miếng gà giòn + 1 khoai tây vừa + 1 Pepsi vừa", "imageUrl": "", "comboItemIds": ["ga-gion-cay-1-mieng", "khoai-tay-chien-vua", "pepsi-vua"], "available": true },
+  { "id": "combo-nhom-ban-be", "name": "Combo Nhóm Bạn Bè", "aliases": ["combo nhóm", "combo bạn bè"], "category": "combo", "priceVnd": 235000, "description": "6 miếng gà giòn + 2 khoai lớn + 4 Pepsi", "imageUrl": "", "comboItemIds": [], "available": true },
+  { "id": "ga-gion-cay-1-mieng", "name": "Gà Giòn Cay (1 miếng)", "aliases": ["gà cay", "gà giòn cay", "gà rán cay"], "category": "chicken", "priceVnd": 35000, "description": "Gà rán giòn vị cay đặc trưng", "imageUrl": "", "available": true },
+  { "id": "ga-gion-khong-cay-1-mieng", "name": "Gà Giòn Không Cay (1 miếng)", "aliases": ["gà không cay", "gà giòn", "gà rán"], "category": "chicken", "priceVnd": 35000, "description": "Gà rán giòn truyền thống", "imageUrl": "", "available": true },
+  { "id": "burger-zinger", "name": "Burger Zinger", "aliases": ["zinger", "bơ gơ gà"], "category": "burger-rice", "priceVnd": 55000, "description": "Burger gà giòn cay sốt mayonnaise", "imageUrl": "", "available": true },
+  { "id": "com-ga-ran", "name": "Cơm Gà Rán", "aliases": ["cơm gà"], "category": "burger-rice", "priceVnd": 45000, "description": "Cơm + 1 miếng gà rán + salad", "imageUrl": "", "available": true },
+  { "id": "khoai-tay-chien-vua", "name": "Khoai Tây Chiên (vừa)", "aliases": ["khoai tây", "khoai chiên"], "category": "snack", "priceVnd": 25000, "description": "", "imageUrl": "", "available": true },
+  { "id": "ga-pop-corn", "name": "Gà Popcorn", "aliases": ["popcorn", "gà viên"], "category": "snack", "priceVnd": 39000, "description": "Gà viên chiên giòn", "imageUrl": "", "available": true },
+  { "id": "kem-tuoi", "name": "Kem Tươi", "aliases": ["kem"], "category": "dessert", "priceVnd": 12000, "description": "", "imageUrl": "", "available": true },
+  { "id": "banh-trung-tan", "name": "Bánh Trứng Tart", "aliases": ["bánh trứng", "tart trứng"], "category": "dessert", "priceVnd": 18000, "description": "", "imageUrl": "", "available": true },
+  { "id": "pepsi-vua", "name": "Pepsi (vừa)", "aliases": ["pepsi", "nước ngọt", "coca"], "category": "drink", "priceVnd": 15000, "description": "", "imageUrl": "", "available": true },
+  { "id": "pepsi-lon", "name": "Pepsi (lớn)", "aliases": ["pepsi lớn", "pepsi to"], "category": "drink", "priceVnd": 20000, "description": "", "imageUrl": "", "available": true }
+]

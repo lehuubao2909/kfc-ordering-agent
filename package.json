@@ -1,26 +1,40 @@
 {
-  "name": "kfc-scaffold",
+  "name": "kfc-ordering-agent",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:push": "drizzle-kit push",
+    "eval": "tsx scripts/agent-eval-cli-harness.ts",
+    "seed": "tsx scripts/seed-menu.ts",
+    "mock-pos": "tsx scripts/generate-mock-pos-transactions.ts",
+    "co-occurrence": "tsx scripts/compute-co-occurrence-matrix.ts",
+    "reset-demo": "tsx scripts/reset-demo-data.ts"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^4.0.11",
+    "@neondatabase/serverless": "^1.1.0",
+    "ai": "^7.0.19",
+    "drizzle-orm": "^0.45.2",
     "next": "16.2.10",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "tailwindcss": "^4",
+    "tsx": "^4.23.0",
     "typescript": "^5"
   }
 }
