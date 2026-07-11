@@ -88,9 +88,9 @@ UI tracking (/order) hiển thị timeline: PLACED → PREPARING → DELIVERING 
 | Trang | Gọi API | Trả về (data) |
 |---|---|---|
 | menu carousel | `GET /api/menu?category=&q=` | `MenuItem[]` ✅ đang chạy |
-| /order/[id] (tracking) | `GET /api/orders/{id}` | 1 `order` (SĐT + địa chỉ **đã mask**) |
-| /pay/[orderId] | `GET /api/orders/{id}` để hiện tổng tiền/món; rồi `POST /api/payment/confirm` `{orderId, token}` | order sau khi PLACED |
-| /admin | 🔒 `GET /api/admin/orders` | `{ orders[] (SĐT masked), funnel, upsell }` |
+| /order/[id] (tracking) | `GET /api/orders/{id}` | 1 `order` **đầy đủ** (địa chỉ/SĐT full) |
+| /pay/[orderId] | `GET /api/orders/{id}` hiện tổng tiền/món; rồi `POST /api/payment/confirm` `{orderId}` | order sau khi PLACED |
+| /admin | 🔒 `GET /api/admin/orders` | `{ orders[] (+upsellAccepted, SĐT masked), metrics:{funnel, aov, upsell} }` |
 | /staff (list) | 🔒 `GET /api/admin/conversations` | `{ conversations: [{psid,state,mode,activeOrderId,cartCount,updatedAt}] }` |
 | /staff (transcript) | 🔒 `GET /api/admin/conversations?psid=X` | `{ psid, transcript: [{direction,text,createdAt}] }` — **nguồn `message_log`, KHÔNG phải sessions.history** |
 | /staff (takeover) | 🔒 `POST /api/admin/conversations/takeover` `{psid, mode}` | `{psid, mode}` |
@@ -98,7 +98,7 @@ UI tracking (/order) hiển thị timeline: PLACED → PREPARING → DELIVERING 
 | /staff (advance) | 🔒 `POST /api/admin/orders/advance` `{orderId, to}` | order sau khi chuyển trạng thái |
 
 **Lưu ý quan trọng cho Dev C:**
-- **Payment token:** link `/pay/[id]` do backend sinh kèm `?t=<token>`; trang /pay phải đọc `t` từ URL và gửi trong body `POST /api/payment/confirm` (thiếu/sai → 403).
-- **PII đã mask:** `deliveryPhone` (`090***4567`) và `deliveryAddress` bị che ở `GET /api/orders/{id}` và `/api/admin/orders` — đừng mong số/địa chỉ đầy đủ.
+- **Payment:** `POST /api/payment/confirm` chỉ cần `{orderId}` (không token). `/order` & `/pay` fetch `GET /api/orders/{id}` runtime — **bỏ `generateStaticParams`** (đơn thật sinh lúc chạy, không có trong static params).
+- **Admin metrics shape:** `data.metrics.{funnel(conversationsStarted/reachedCart/confirmed/paid/delivered), aov(withoutUpsellVnd/withUpsellVnd/upliftPct/assumption), upsell(offered/accepted/acceptanceRatePct)}`. `nluEval` chưa có (chờ Dev B). SĐT ở list admin bị mask; `GET /api/orders/{id}` thì full.
 
 Fixtures mẫu khớp shape: `src/fixtures/` — import trực tiếp render UI, đổi sang fetch API thật (giữ nguyên component).

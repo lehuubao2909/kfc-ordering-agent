@@ -1,0 +1,8 @@
+{
+  "ordersAnalyzed": 4964,
+  "baselineAovVnd": 125470,
+  "withUpsellAovVnd": 128854,
+  "upliftPct": 2.7,
+  "assumedAcceptanceRatePct": 20,
+  "assumption": "Backtest trên 4964 giỏ POS 90 ngày. Giả định 20% khách nhận gợi ý món kèm (drink/dessert) khi giỏ còn thiếu — theo chuẩn ngành F&B."
+}

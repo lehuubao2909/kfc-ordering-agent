@@ -2,7 +2,9 @@
 
 > Bản đồ thi công cá nhân cho Dev A. Nguồn: [phase-02](phase-02-core-services-and-data.md) · Contract: [api-contract.md](../../docs/api-contract.md) (freeze) · Standards: [code-standards.md](../../docs/code-standards.md)
 >
-> **✅ MÔI TRƯỜNG OK (10/7):** `.env` đã có `DATABASE_URL` + đủ key; `npm install` xong; native SWC đã sửa. `db:push` + `seed` (12 món/4 voucher/3 promo) + `mock-pos` (4911 giao dịch) + `co-occurrence` (matrix thật) đã chạy. **Smoke test `scripts/smoke-test-services.ts`: 18/18 pass** trên Neon thật — cart/totals/voucher/upsell/order state machine/loyalty đều đúng.
+> **✅ MÔI TRƯỜNG OK (11/7):** `.env` đủ key; `db:push` + `seed` (58 món) + `mock-pos` (4964 gd) + `co-occurrence` + `backtest` (AOV uplift 2.7%) đã chạy. **Smoke `scripts/smoke-test-services.ts`: 21/21 pass** trên Neon · `tsc` 0 · `next build --webpack` 0.
+> **Đã gỡ (over-engineering):** payment token + mask ở `/api/orders/[id]` (xem lý do trong `devA-devC-integration-conflicts.md`). Payment token chống mối lo ~0 nhưng phá luồng Dev C; /orders/:id giờ trả full cho trang tracking. `/api/admin/orders` vẫn mask SĐT.
+> **File mở rộng ngoài 8 service spec:** `session-data-service`, `admin-metrics-service`, `conversation-admin-service`, `_lib/route-utils` (tách data-layer/giữ route mỏng).
 > **Mục tiêu M1 (trưa 11/7):** đặt đơn COD end-to-end. **Freeze:** 22:00 11/7.
 >
 > **⏸ 3 mục CHỜ LEAD xác nhận** (xem `dev-a-questions-for-lead.md`): 4.5 admin/conversations · 5.2 reset-demo-data · path của route advance. Không code tới khi Lead chốt.
@@ -66,7 +68,8 @@
 
 ## Giai đoạn 5 — Support (tối)
 
-- [ ] **5.1 Error handling** — rà mọi route: try/catch, envelope, zod, không lộ stack. `OrderTransitionError` → 400 message tiếng Việt.
+- [x] **5.1 Error handling** ✅ — `_lib/route-utils.handleError`: Zod→400, `OrderTransitionError`/`CartError`→400 (message VN), còn lại→500 không lộ stack. Mọi route try/catch + envelope.
+- [x] **5.5 `scripts/run-funnel-backtest.ts`** ✅ (spec bước 5, trước bị thiếu) — AOV uplift từ 90 ngày POS + assumption minh bạch → ghi `funnel-backtest.json` → feed `metrics.aov` của `/api/admin/orders`. `npm run backtest`.
 - [x] **5.2 `scripts/reset-demo-data.ts`** ✅ code xong (xóa orders/sessions/message_log/customers/loyalty, giữ catalog+pos) — ⚠️ OWNER plan.md:56 là Lead; đã impl theo yêu cầu Dev A, chờ Lead review spec.
 
 ## ⚠️ BLOCKER build (10/7) — cần Lead

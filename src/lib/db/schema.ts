@@ -87,7 +87,6 @@ export const orders = pgTable("orders", {
 }, (t) => [
   index("orders_psid_created_idx").on(t.psid, t.createdAt.desc()), // getActiveOrderByPsid
   index("orders_created_idx").on(t.createdAt.desc()),              // admin polling ORDER BY createdAt
-  index("orders_status_idx").on(t.status),                        // funnel filter
 ]);
 
 export const loyaltyAccounts = pgTable("loyalty_accounts", {

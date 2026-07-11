@@ -12,6 +12,7 @@
     "seed": "tsx scripts/seed-menu.ts",
     "mock-pos": "tsx scripts/generate-mock-pos-transactions.ts",
     "co-occurrence": "tsx scripts/compute-co-occurrence-matrix.ts",
+    "backtest": "tsx scripts/run-funnel-backtest.ts",
     "reset-demo": "tsx scripts/reset-demo-data.ts"
   },
   "dependencies": {

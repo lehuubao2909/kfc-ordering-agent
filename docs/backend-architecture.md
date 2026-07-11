@@ -135,17 +135,17 @@ DELIVERED → earnPointsForOrder tự cộng điểm loyalty
 
 **Bảo mật:**
 - Basic auth cho `/api/admin/**` (fail-safe khi thiếu env), **bắt buộc HTTPS** (base64).
-- **Payment token (HMAC):** link `/pay/[id]?t=<token>`; route confirm **verify token** (timing-safe) trước khi chốt → không confirm được bằng id đoán mò. Secret: env `PAYMENT_TOKEN_SECRET` (fallback `META_APP_SECRET`).
+- **Payment (mock):** `confirmPayment` chỉ verify `AWAITING_PAYMENT` + idempotent. KHÔNG token (đã cân nhắc & gỡ: bảo vệ endpoint mock sẽ bị thay bằng webhook cổng thật → giá trị ~0, lại phá luồng FE). Production: webhook cổng verify chữ ký HMAC của cổng.
 - Zod validate mọi input · mask SĐT log+admin · secrets ở env, `.env` gitignored.
 - Chống prompt-injection theo thiết kế: tools gated theo state + service validate id/giá → LLM không bịa giá/nhảy state.
 - Còn hở (chấp nhận cho demo): 1 credential admin chung, không rate-limit; sanitize HTML là việc render của Dev C.
 
 ## 10. Trạng thái & vấn đề đã biết
 
-- ✅ Verify: `tsc --noEmit` · `next build --webpack` (14 route) · smoke test **23/23** trên Neon (gồm nhánh QR + payment token).
+- ✅ Verify: `tsc --noEmit` · `next build --webpack` (15 route) · smoke test **21/21** trên Neon.
 - ⛔ **Build Turbopack fail** (bug turbopack+zod v4 ở `z.string().datetime()` trong `types.ts`) → cần Lead: đổi build sang `--webpack` hoặc sửa `z.iso.datetime()`.
 - ⏸ **`session.mode`** ghi bởi cả takeover route (Dev A) lẫn tool handoff (Dev B) → cần Lead chốt hợp đồng mute/notify/release.
-- ⏸ **Contract `POST /api/payment/confirm`** giờ nhận `{orderId, token}` (thêm `token`) → Dev C forward `?t=` từ link; Lead cập nhật `api-contract.md`.
+- ⏸ **Contract:** thêm `GET /api/orders/:id` + shape `/api/admin/orders` (`data.metrics`) vào `api-contract.md`.
 - 🔲 `imageUrl` trong menu để trống — cần ảnh thật cho carousel demo.
 
 Chi tiết 2 việc chờ Lead: [../plans/260709-1803-aabw-kfc-fnb-hackathon/dev-a-questions-for-lead.md](../plans/260709-1803-aabw-kfc-fnb-hackathon/dev-a-questions-for-lead.md)

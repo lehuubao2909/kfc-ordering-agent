@@ -10,7 +10,8 @@ import { db } from "../src/lib/db/client";
 import { orders, sessions, customers, loyaltyAccounts } from "../src/lib/db/schema";
 import { addToCart, getCart, clearCart } from "../src/lib/services/cart-service";
 import { calculateOrderTotals, createOrderFromSession, advanceOrderStatus, cancelOrder, getOrderById } from "../src/lib/services/order-service";
-import { getPaymentLink, verifyPaymentToken, confirmPayment } from "../src/lib/services/payment-mock-service";
+import { getPaymentLink, confirmPayment } from "../src/lib/services/payment-mock-service";
+import { getOrdersOverview } from "../src/lib/services/admin-metrics-service";
 import { autoApplyBestVoucher } from "../src/lib/services/promotion-voucher-service";
 import { getUpsellSuggestions } from "../src/lib/services/upsell-recommendation-service";
 import { getLoyaltyPoints } from "../src/lib/services/loyalty-service";
@@ -91,19 +92,23 @@ async function main() {
   const cancelled = await cancelOrder(order2.id);
   check("PLACED → CANCELLED", cancelled.status === "CANCELLED");
 
-  console.log("\n9) Thanh toán QR + payment token");
+  console.log("\n9) Thanh toán QR mock");
   await clearCart(PSID);
   await addToCart(PSID, { itemId: "burger-zinger", quantity: 1 });
   const qrOrder = await createOrderFromSession(PSID, "qr");
   check("QR → AWAITING_PAYMENT", qrOrder.status === "AWAITING_PAYMENT");
-  const link = getPaymentLink(qrOrder.id);
-  const token = new URL(link).searchParams.get("t") ?? "";
-  check("link /pay có token", token.length > 0, `(t=${token.slice(0, 8)}…)`);
-  check("verify token đúng → pass", verifyPaymentToken(qrOrder.id, token));
-  check("verify token sai → từ chối", !verifyPaymentToken(qrOrder.id, "token-gia"));
+  check("getPaymentLink trỏ /pay/{id}", getPaymentLink(qrOrder.id).endsWith(`/pay/${qrOrder.id}`));
   await confirmPayment(qrOrder.id);
   const paid = await getOrderById(qrOrder.id);
   check("confirmPayment → PLACED", paid?.status === "PLACED");
+
+  console.log("\n10) Admin metrics (SQL aggregate funnel)");
+  const ov = await getOrdersOverview();
+  const f = ov.metrics.funnel;
+  check("funnel là số", [f.conversationsStarted, f.reachedCart, f.confirmed, f.paid, f.delivered].every((n) => typeof n === "number"), `(${JSON.stringify(f)})`);
+  check("upsell acceptanceRatePct là số", typeof ov.metrics.upsell.acceptanceRatePct === "number");
+  check("aov có assumption", typeof ov.metrics.aov.assumption === "string" && ov.metrics.aov.assumption.length > 0);
+  check("order có upsellAccepted", ov.orders.length === 0 || typeof ov.orders[0].upsellAccepted === "boolean");
 
   await cleanup();
   console.log(`\n=== KẾT QUẢ: ${pass} pass / ${fail} fail ===`);
