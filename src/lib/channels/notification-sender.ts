@@ -4,6 +4,7 @@
  */
 import { onOrderStatusChange } from "@/lib/services/order-status-events";
 import { sendOrderUpdateMessage } from "./messenger-adapter";
+import { recordOutgoingMessage } from "@/lib/agent/incoming-message-queue";
 import { Order } from "@/lib/types";
 
 const STATUS_MESSAGES: Partial<Record<Order["status"], (o: Order) => string>> = {
@@ -19,6 +20,10 @@ export function registerOrderStatusNotifications(): void {
   registered = true;
   onOrderStatusChange(async (order) => {
     const template = STATUS_MESSAGES[order.status];
-    if (template) await sendOrderUpdateMessage(order.psid, template(order));
+    if (!template) return;
+    const text = template(order);
+    await sendOrderUpdateMessage(order.psid, text);
+    // Ghi vào message_log để transcript staff console đầy đủ (khách thấy gì, staff thấy nấy)
+    await recordOutgoingMessage(order.psid, text).catch((err) => console.error("log push lỗi (bỏ qua):", err));
   });
 }
