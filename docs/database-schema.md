@@ -58,7 +58,8 @@ UI tracking (/order) hiển thị timeline: PLACED → PREPARING → DELIVERING 
 | mode | text | agent/human |
 | cart | jsonb | `{items:[{itemId,quantity,note?}], voucherCode?}` |
 | activeOrderId | text? | |
-| history | jsonb | `[{role, content}]` — transcript hiển thị |
+| history | jsonb | `[{role, content}]` — do Dev B (agent) ghi. **KHÔNG dùng cho transcript staff** (xem message_log) |
+| processingUntil | timestamp? | lock chống xử lý song song (Dev B), steal sau 60s |
 | updatedAt | timestamp | sort list theo cột này |
 
 ### customers
@@ -70,7 +71,7 @@ UI tracking (/order) hiển thị timeline: PLACED → PREPARING → DELIVERING 
 ### promotions
 `id PK, title, description, discountType, discountValue, active` — agent giới thiệu khi khách hỏi ưu đãi.
 
-### stores — cửa hàng KFC (MỚI 11/7: store-aware ordering)
+### stores — cửa hàng KFC (MỚI 11/7: store-aware ordering — ⚠️ Dev A CHƯA implement, xem gate 18:00)
 | Cột | Kiểu | Ghi chú |
 |---|---|---|
 | id | text PK | `kfc-nguyen-trai-q5` |
@@ -97,12 +98,23 @@ Fixture: `src/fixtures/stores-sample.json` (10 cửa hàng HCM; Nguyễn Trãi Q
 
 ## Dev C dùng gì (API → shape)
 
-| Trang | Gọi API | Trả về |
-|---|---|---|
-| /admin | GET /api/admin/orders | `orders[]` + funnel metrics |
-| /staff | GET /api/admin/conversations | sessions[] + history (transcript) |
-| /order/[id] | (tracking) | 1 `order` theo status |
-| /pay/[orderId] | (payment) | 1 `order` + totals |
-| menu carousel | GET /api/menu | `menuItems[]` ✅ đang chạy |
+> Envelope mọi route: `{ ok:true, data }` hoặc `{ ok:false, error:{code,message} }`.
+> 🔒 = cần **Basic auth** header `Authorization: Basic base64(user:pass)` (env `ADMIN_BASIC_AUTH`) — thiếu → 401.
 
-Fixtures mẫu khớp shape: `src/fixtures/` — import trực tiếp render UI, đổi sang fetch API thật khi Dev A xong (giữ nguyên component).
+| Trang | Gọi API | Trả về (data) |
+|---|---|---|
+| menu carousel | `GET /api/menu?category=&q=` | `MenuItem[]` ✅ đang chạy |
+| /order/[id] (tracking) | `GET /api/orders/{id}` | 1 `order` **đầy đủ** (địa chỉ/SĐT full) |
+| /pay/[orderId] | `GET /api/orders/{id}` hiện tổng tiền/món; rồi `POST /api/payment/confirm` `{orderId}` | order sau khi PLACED |
+| /admin | 🔒 `GET /api/admin/orders` | `{ orders[] (+upsellAccepted, SĐT masked), metrics:{funnel, aov, upsell} }` |
+| /staff (list) | 🔒 `GET /api/admin/conversations` | `{ conversations: [{psid,state,mode,activeOrderId,cartCount,updatedAt}] }` |
+| /staff (transcript) | 🔒 `GET /api/admin/conversations?psid=X` | `{ psid, transcript: [{direction,text,createdAt}] }` — **nguồn `message_log`, KHÔNG phải sessions.history** |
+| /staff (takeover) | 🔒 `POST /api/admin/conversations/takeover` `{psid, mode}` | `{psid, mode}` |
+| /staff (gõ tay) | 🔒 `POST /api/admin/conversations/send` `{psid, text}` | `{psid, sent}` |
+| /staff (advance) | 🔒 `POST /api/admin/orders/advance` `{orderId, to}` | order sau khi chuyển trạng thái |
+
+**Lưu ý quan trọng cho Dev C:**
+- **Payment:** `POST /api/payment/confirm` chỉ cần `{orderId}` (không token). `/order` & `/pay` fetch `GET /api/orders/{id}` runtime — **bỏ `generateStaticParams`** (đơn thật sinh lúc chạy, không có trong static params).
+- **Admin metrics shape:** `data.metrics.{funnel(conversationsStarted/reachedCart/confirmed/paid/delivered), aov(withoutUpsellVnd/withUpsellVnd/upliftPct/assumption), upsell(offered/accepted/acceptanceRatePct)}`. `nluEval` chưa có (chờ Dev B). SĐT ở list admin bị mask; `GET /api/orders/{id}` thì full.
+
+Fixtures mẫu khớp shape: `src/fixtures/` — import trực tiếp render UI, đổi sang fetch API thật (giữ nguyên component).
