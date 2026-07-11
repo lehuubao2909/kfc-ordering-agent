@@ -18,7 +18,7 @@
 | 📄 Pitch deck (PDF) | [`/kfc-ordering-agent-slides.pdf`](https://kfc-ordering-agent.vercel.app/kfc-ordering-agent-slides.pdf) |
 | 🔒 Privacy policy | `/privacy-policy` |
 
-*Tài khoản demo `/admin`, `/staff`: cấp theo yêu cầu (env `ADMIN_BASIC_AUTH`).*
+*`/admin` và `/staff` tự đăng nhập bằng tài khoản demo (**kfc / demo2026**) — mở là vào thẳng, không cần thao tác. Đổi credentials: env `ADMIN_BASIC_AUTH` + `NEXT_PUBLIC_DEMO_ADMIN_AUTH`.*
 
 ## ✨ Vì sao đây là agent, không phải chatbot
 

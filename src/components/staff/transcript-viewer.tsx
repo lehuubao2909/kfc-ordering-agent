@@ -27,7 +27,8 @@ export function TranscriptViewer({ customerName, entries }: { customerName: stri
       tabIndex={0}
       aria-label={`Nội dung hội thoại với ${customerName}`}
     >
-      <div className="mx-auto w-full min-w-0 max-w-2xl space-y-3 pb-2">
+      {/* Full-width: bubble khách trái / bot phải như app chat thật (fix 11/7 tối: bị gom giữa, trống 2 bên) */}
+      <div className="w-full min-w-0 space-y-3 pb-2">
         {entries.length === 0 ? (
           <p className="py-10 text-center text-sm text-zinc-400">Chưa có tin nhắn — hội thoại sẽ hiện khi khách nhắn vào page.</p>
         ) : (
@@ -47,7 +48,7 @@ export function TranscriptViewer({ customerName, entries }: { customerName: stri
             ) : (
               <div key={`${index}-${message.createdAt}`} className={`flex min-w-0 ${message.direction === "in" ? "justify-start" : "justify-end"}`}>
                 <div
-                  className={`min-w-0 max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm leading-6 shadow-sm sm:max-w-[72%] sm:px-4 sm:py-3 ${
+                  className={`min-w-0 max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm leading-6 shadow-sm sm:max-w-[70%] sm:px-4 sm:py-3 lg:max-w-[58%] ${
                     message.direction === "in" ? "rounded-bl-md bg-white text-zinc-800" : "rounded-br-md bg-zinc-900 text-white"
                   }`}
                 >
