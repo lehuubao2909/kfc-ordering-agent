@@ -38,6 +38,12 @@ Lịch Demo Day: 09:00 check-in (BẮT BUỘC ≥1 người, vắng = loại) ·
 6. **3:50–4:50 DEMO 60" theo storyline guide:** Goal (khách đói nhắn tin) → Trigger → Agent Acts (chiếu song song điện thoại + staff console tool-trace) → Outcome (mã đơn + push) → Proof (admin funnel). KHÔNG show login/setup. Kết ở outcome khách.
 
 **Q&A 2': dùng chiến thuật guide — "Cho phép em gom câu hỏi trước ạ?" (0:20 gom, 1:20 trả lời theo nhóm).**
+Công thức mỗi câu (15–25s): **Answer** (kết luận trước) → **Support** (1 fact: eval 24/24, tool-trace, state machine) → **Connect** (về giá trị khách/KFC). Bị hỏi thứ chưa có: "chưa validated — cái chúng tôi biết là X, sẽ test bằng Y ở pilot."
+
+**Appendix slides A1–A8 (Playbook trang 17 — Round 2/Q&A, "answer first, appendix là bằng chứng"):**
+A1 Agentic workflow (Goal→Plan→Tools→Act→Verify trên flow thật + ảnh tool-trace) · A2 Technical architecture (1 sơ đồ: Messenger → agent state-gated → services → DB; "architecture is evidence, not the main character") · A3 Safety + human oversight (guardrails giá-từ-DB, validate 2 lớp, handoff, mask SĐT, 24h policy) · A4 User research (transcript test thật + các bug tìm được & fix — thành thật là điểm cộng) · A5 ROI calculation (công thức + assumptions dán nhãn) · A6 Alternatives (vì sao không rule-bot/không general assistant) · A7 Evaluation results (24/24, có case bẫy) · A8 Roadmap + limitations (per-store menu overlay, distance API, VNPay webhook, Recurring Notifications opt-in, blacklist bom hàng).
+
+**Bài tập 6 câu 1-dòng (cả team, 15'):** mỗi tiêu chí rubric 1 câu thuộc lòng — đặc biệt Difference: "General assistant không cầm được tiền — state machine + tools khoá theo bước nên LLM không bao giờ tự quyết giá/đơn."
 
 **Round 2 (12'):** mở rộng — giám khảo quét QR tự đặt trên điện thoại họ (Người 2 hỗ trợ), staff advance → push nổi máy giám khảo, handoff live, kiến trúc sâu, business case, roadmap P2 kiosk/P1/P3.
 
