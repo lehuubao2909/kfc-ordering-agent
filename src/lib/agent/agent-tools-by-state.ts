@@ -29,7 +29,7 @@ export const TOOLS_BY_STATE: Record<OrderState, string[]> = {
   CONFIRMING: ["view_cart", "add_to_cart", "remove_from_cart", "get_upsell_suggestions", "set_delivery_info", "get_order_status", "handoff_to_human"],
   COLLECTING_DELIVERY: ["set_delivery_info", "get_loyalty_points", "get_order_status", "handoff_to_human"],
   SELECTING_PAYMENT: ["select_payment_method", "get_loyalty_points", "view_cart", "get_order_status", "handoff_to_human"],
-  AWAITING_PAYMENT: ["get_order_status", "cancel_order", "handoff_to_human"],
+  AWAITING_PAYMENT: ["get_order_status", "cancel_order", "get_menu", "get_promotions", "handoff_to_human"],
   PLACED: ["get_order_status", "cancel_order", "get_menu", "handoff_to_human"],
   PREPARING: ["get_order_status", "get_menu", "handoff_to_human"],
   DELIVERING: ["get_order_status", "get_menu", "handoff_to_human"],
@@ -151,11 +151,11 @@ function buildAllTools(psid: string): ToolSet {
     }),
 
     set_delivery_info: tool({
-      description: "Lưu địa chỉ + SĐT khách và xác định cửa hàng KFC phục vụ. Gọi khi khách đã cho ĐỦ địa chỉ VÀ số điện thoại.",
+      description: "Lưu địa chỉ + SĐT khách và xác định cửa hàng KFC phục vụ. Gọi NGAY khi khách đã cho đủ địa chỉ VÀ số điện thoại — KHÔNG hỏi thêm gì khác (tên không bắt buộc).",
       inputSchema: z.object({
         address: z.string().min(5).describe("địa chỉ giao hàng đầy đủ"),
         phone: z.string().min(9).describe("số điện thoại khách"),
-        name: z.string().optional(),
+        name: z.string().optional().describe("CHỈ truyền nếu khách tự xưng tên — TUYỆT ĐỐI không chủ động hỏi tên, địa chỉ + SĐT là đủ"),
       }),
       execute: async ({ address, phone, name }) => {
         const digits = phone.replace(/\D/g, "");
@@ -244,9 +244,9 @@ function buildAllTools(psid: string): ToolSet {
         const last = await getLatestOrderByPsid(psid);
         if (!last) return { note: "Khách chưa đặt đơn nào. Mời khách xem menu đặt món." };
         if (last.status === "DELIVERED")
-          return { orderId: last.id, status: last.status, note: `Đơn ${last.id} ĐÃ GIAO THÀNH CÔNG. Xác nhận với khách + mời đặt đơn mới nếu muốn.` };
+          return { orderId: last.id, status: last.status, note: `Đơn gần nhất ${last.id} đã giao xong. CHỈ nhắc nếu khách đang hỏi về đơn — KHÔNG tự lặp lại thông tin này ở các câu sau.` };
         if (last.status === "CANCELLED")
-          return { orderId: last.id, status: last.status, note: `Đơn ${last.id} đã hủy trước đó. Mời khách đặt đơn mới.` };
+          return { orderId: last.id, status: last.status, note: `Đơn gần nhất ${last.id} đã hủy. CHỈ nhắc nếu khách đang hỏi về đơn.` };
         return { orderId: last.id, status: last.status, total: fmtVnd(last.totalVnd), trackingUrl: `${APP_URL}/order/${last.id}` };
       },
     }),

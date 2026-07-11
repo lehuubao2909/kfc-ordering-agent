@@ -10,7 +10,8 @@ import { and, eq, isNull, lt, or } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { sessions } from "@/lib/db/schema";
 import { Cart, CartSchema, OrderState, SessionMode } from "@/lib/types";
-import { getOrCreateSession } from "@/lib/services/session-data-service";
+import { getOrCreateSession, saveSessionCart, setSessionState } from "@/lib/services/session-data-service";
+import { getOrderById } from "@/lib/services/order-service";
 
 export type ConversationSession = {
   psid: string;
@@ -24,14 +25,44 @@ export type ConversationSession = {
 const LOCK_MS = 60_000; // steal lock sau 60s (instance trước treo/chết)
 const HISTORY_LIMIT = 12; // token bounded — chỉ giữ 12 tin gần nhất
 
-/** Đọc session đầy đủ (tạo mới nếu chưa có, qua session-data-service của Dev A). */
+// State thuộc vòng đời ĐƠN HÀNG — hợp lệ CHỈ khi đơn gắn kèm đang thật sự ở trạng thái đó.
+const ORDER_LIFECYCLE_STATES: OrderState[] = ["AWAITING_PAYMENT", "PLACED", "PREPARING", "DELIVERING"];
+
+/**
+ * Đọc session đầy đủ (tạo mới nếu chưa có) + SELF-HEAL (fix 11/7 chiều):
+ * session kẹt ở state vòng-đời-đơn nhưng đơn thật đã DELIVERED/CANCELLED/không tồn tại
+ * → đồng bộ lại state + clear giỏ cũ. Chữa cả session hỏng sẵn trong DB lẫn mọi desync tương lai
+ * (bug production: session kẹt AWAITING_PAYMENT → agent mất sạch tools menu/giỏ → bịa flow bằng lời).
+ */
 export async function getSession(psid: string): Promise<ConversationSession> {
   const row = await getOrCreateSession(psid);
+  let state = row.state as OrderState;
+  let cart = CartSchema.parse(row.cart ?? { items: [] });
+
+  if (ORDER_LIFECYCLE_STATES.includes(state)) {
+    const order = row.activeOrderId ? await getOrderById(row.activeOrderId) : null;
+    const actual = order?.status ?? null;
+    let healed: OrderState | null = null;
+    if (!order) healed = "BROWSING"; // state đơn-hàng mà không gắn đơn nào → về đầu
+    else if (actual === "DELIVERED" || actual === "CANCELLED") healed = actual; // đơn xong → mở bộ tools đặt-mới
+    else if (actual && actual !== state) healed = actual as OrderState; // lệch tiến độ → sync theo đơn
+
+    if (healed) {
+      state = healed;
+      await setSessionState(psid, healed);
+      if (cart.items.length) {
+        // Giỏ ở các state này là giỏ của đơn ĐÃ tạo (pre-fix) — clear để đơn mới sạch
+        cart = { items: [] };
+        await saveSessionCart(psid, cart);
+      }
+    }
+  }
+
   return {
     psid: row.psid,
-    state: row.state as OrderState,
+    state,
     mode: row.mode as SessionMode,
-    cart: CartSchema.parse(row.cart ?? { items: [] }),
+    cart,
     activeOrderId: row.activeOrderId ?? null,
     history: (row.history as { role: string; content: string }[]) ?? [],
   };
