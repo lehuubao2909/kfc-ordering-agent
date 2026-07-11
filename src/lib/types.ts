@@ -60,7 +60,7 @@ export type Cart = z.infer<typeof CartSchema>;
 // ===== Upsell recommendation =====
 export const RecommendationRequestSchema = z.object({
   cart: z.array(CartItemSchema),
-  timestamp: z.string().datetime().optional(), // default = now; override để demo daypart
+  timestamp: z.iso.datetime().optional(), // zod v4 API (z.string().datetime() làm Turbopack build fail); default = now, override để demo daypart
   channel: z.enum(["messenger", "eval"]).default("messenger"),
 });
 export const RecommendationSuggestionSchema = z.object({
@@ -71,10 +71,17 @@ export const RecommendationSuggestionSchema = z.object({
 export type RecommendationSuggestion = z.infer<typeof RecommendationSuggestionSchema>;
 
 // ===== Order =====
+// Dòng đơn snapshot giá tại thời điểm đặt (duyệt 11/7, đề xuất Dev A #5d) — hóa đơn không đổi khi giá menu đổi.
+// unitPriceVnd optional TẠM để main xanh; TODO(Dev A): wire createOrderFromSession luôn set giá → báo Lead flip required.
+export const OrderLineSchema = CartItemSchema.extend({
+  unitPriceVnd: z.number().int().nonnegative().optional(),
+});
+export type OrderLine = z.infer<typeof OrderLineSchema>;
+
 export const OrderSchema = z.object({
   id: z.string(),
   psid: z.string(), // Messenger sender id
-  items: z.array(CartItemSchema),
+  items: z.array(OrderLineSchema),
   subtotalVnd: z.number().int(),
   discountVnd: z.number().int().default(0),
   shippingFeeVnd: z.number().int().default(15000),
