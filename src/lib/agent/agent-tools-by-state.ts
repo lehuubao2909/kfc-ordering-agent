@@ -182,9 +182,11 @@ function buildAllTools(psid: string): ToolSet {
           store: { name: res.store.name, closeHour: res.store.closeHour },
           storeWasOpen: res.storeWasOpen,
           note:
-            (res.storeWasOpen
-              ? `Báo khách: "${res.store.name}" (mở đến ${res.store.closeHour}h) sẽ chuẩn bị đơn. Rồi hỏi cách thanh toán (tiền mặt/QR/thẻ).`
-              : `Cửa hàng gần nhất đã đóng, đơn chuyển về "${res.store.name}". Báo khách nhẹ nhàng rồi hỏi cách thanh toán.`) +
+            (res.fallbackUsed
+              ? `Địa chỉ ngoài các quận hệ thống phủ — đơn tạm gán cửa hàng trung tâm "${res.store.name}". Báo khách minh bạch: khu vực demo phủ TP.HCM, đơn sẽ do cửa hàng trung tâm phục vụ (production sẽ kiểm tra bán kính giao trước khi nhận đơn). Rồi hỏi cách thanh toán.`
+              : res.storeWasOpen
+                ? `Báo khách: "${res.store.name}" (mở đến ${res.store.closeHour}h) sẽ chuẩn bị đơn. Rồi hỏi cách thanh toán (tiền mặt/QR/thẻ).`
+                : `Cửa hàng gần nhất đã đóng, đơn chuyển về "${res.store.name}". Báo khách nhẹ nhàng rồi hỏi cách thanh toán.`) +
             " QUAN TRỌNG: nếu khách ĐÃ nói cách thanh toán từ trước (vd 'tiền mặt') thì GỌI select_payment_method NGAY, đừng hỏi lại và đừng tự nói 'em đặt hàng' suông.",
         };
       },

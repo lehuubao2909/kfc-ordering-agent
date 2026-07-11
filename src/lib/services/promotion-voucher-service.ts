@@ -53,6 +53,44 @@ export async function autoApplyBestVoucher(_cart: Cart, subtotalVnd: number): Pr
   return best;
 }
 
+export type VoucherOpportunity = { code: string; gapVnd: number; extraBenefitVnd: number; hint: string };
+
+/**
+ * Smart threshold upsell (11/7 chiều): tìm mã CHƯA đạt mà chỉ cần thêm ít tiền là lợi hơn hẳn
+ * → agent gợi ý "thêm 1 món ~Xđ nữa là được freeship". Deterministic — service tính, LLM chỉ relay.
+ * Chỉ gợi khi gap ≤ 60k (khuyên thêm 200k là phản cảm) và lợi ích TĂNG THÊM > 5k so với mã đang áp.
+ */
+export async function findVoucherOpportunity(subtotalVnd: number): Promise<VoucherOpportunity | null> {
+  const MAX_GAP_VND = 60_000;
+  const MIN_EXTRA_BENEFIT_VND = 5_000;
+  const rows = await db.select().from(vouchers).where(eq(vouchers.active, true));
+
+  // Lợi ích hiện tại (mã tốt nhất đang đạt được)
+  let currentBest = 0;
+  for (const v of rows) currentBest = Math.max(currentBest, discountOf(v, subtotalVnd));
+
+  let best: VoucherOpportunity | null = null;
+  for (const v of rows) {
+    if (subtotalVnd >= v.minOrderVnd) continue; // đã đạt rồi
+    const gap = v.minOrderVnd - subtotalVnd;
+    if (gap > MAX_GAP_VND) continue;
+    const benefitAtThreshold = discountOf(v, v.minOrderVnd);
+    const extra = benefitAtThreshold - currentBest;
+    if (extra < MIN_EXTRA_BENEFIT_VND) continue;
+    // Ưu tiên: lợi thêm nhiều nhất, hoà thì gap nhỏ nhất
+    if (!best || extra > best.extraBenefitVnd || (extra === best.extraBenefitVnd && gap < best.gapVnd)) {
+      const benefitText = v.discountType === "freeship" ? `miễn phí ship (lợi ${fmt(benefitAtThreshold)})` : `giảm ${fmt(benefitAtThreshold)}`;
+      best = {
+        code: v.code,
+        gapVnd: gap,
+        extraBenefitVnd: extra,
+        hint: `Đơn thêm ${fmt(gap)} nữa là đạt mã ${v.code} — ${benefitText}, lợi thêm ${fmt(extra)} so với hiện tại.`,
+      };
+    }
+  }
+  return best;
+}
+
 // Áp mã cụ thể khách đưa; sai/hết hạn/không đủ điều kiện → message thân thiện.
 export async function applyVoucherCode(_cart: Cart, code: string, subtotalVnd: number): Promise<VoucherResult> {
   const normalized = code.trim().toUpperCase();

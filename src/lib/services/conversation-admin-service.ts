@@ -7,12 +7,15 @@ import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { customers, messageLog, sessions } from "@/lib/db/schema";
 
+import { getStoreById } from "./store-service";
+
 export type ConversationSummary = {
   psid: string;
   customerName: string; // từ customers.name; chưa có → "Khách •••1234"
   state: string;
   mode: string;
   activeOrderId: string | null;
+  storeName: string | null; // cửa hàng phục vụ — staff biết hội thoại thuộc cửa hàng nào (route-by-store)
   cartCount: number;
   lastMessage: string; // tin cuối trong sessions.history (preview ở list)
   updatedAt: string;
@@ -24,16 +27,22 @@ export async function listConversations(): Promise<ConversationSummary[]> {
     .from(sessions)
     .leftJoin(customers, eq(customers.psid, sessions.psid))
     .orderBy(desc(sessions.updatedAt));
-  return rows.map(({ s, customerName }) => ({
-    psid: s.psid,
-    customerName: customerName ?? `Khách •••${s.psid.slice(-4)}`,
-    state: s.state,
-    mode: s.mode,
-    activeOrderId: s.activeOrderId,
-    cartCount: s.cart?.items?.length ?? 0,
-    lastMessage: s.history?.at(-1)?.content ?? "",
-    updatedAt: s.updatedAt.toISOString(),
-  }));
+  const result: ConversationSummary[] = [];
+  for (const { s, customerName } of rows) {
+    const store = s.storeId ? await getStoreById(s.storeId) : null; // cached in-memory, không tốn query
+    result.push({
+      psid: s.psid,
+      customerName: customerName ?? `Khách •••${s.psid.slice(-4)}`,
+      state: s.state,
+      mode: s.mode,
+      activeOrderId: s.activeOrderId,
+      storeName: store?.name ?? null,
+      cartCount: s.cart?.items?.length ?? 0,
+      lastMessage: s.history?.at(-1)?.content ?? "",
+      updatedAt: s.updatedAt.toISOString(),
+    });
+  }
+  return result;
 }
 
 export type TranscriptEntry = { direction: string; text: string; createdAt: string };

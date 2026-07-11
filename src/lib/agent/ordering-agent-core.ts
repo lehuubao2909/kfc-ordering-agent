@@ -32,6 +32,7 @@ export async function runOrderingAgentTurn(psid: string, userMessages: string[])
   const system = buildSystemPrompt(session.state, session.cart, {
     lastAddress: customer?.lastAddress ?? null,
     customerName: customer?.name ?? null,
+    isNewConversation: session.history.length === 0, // phiên mới → giới thiệu là trợ lý ảo (bot disclosure)
   });
 
   const messages: ModelMessage[] = [

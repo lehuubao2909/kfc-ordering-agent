@@ -6,7 +6,7 @@ import { MenuItem } from "@/lib/types";
 import { getMenuItemById, searchMenuItems } from "@/lib/services/menu-service";
 import { getCart } from "@/lib/services/cart-service";
 import { calculateOrderTotals } from "@/lib/services/order-service";
-import { autoApplyBestVoucher } from "@/lib/services/promotion-voucher-service";
+import { autoApplyBestVoucher, findVoucherOpportunity } from "@/lib/services/promotion-voucher-service";
 
 export const fmtVnd = (n: number): string => n.toLocaleString("vi-VN") + "đ";
 
@@ -31,6 +31,7 @@ export type OrderSummary = {
   shipping: string;
   discount: string | null;
   voucherExplanation: string | null;
+  voucherHint: string | null; // "thêm Xđ nữa đạt mã Y" — threshold upsell
   total: string;
   itemCount: number;
 };
@@ -63,12 +64,21 @@ export async function buildOrderSummary(psid: string): Promise<OrderSummary> {
     }
   }
 
+  // Threshold upsell: "thêm Xđ nữa là freeship" — deterministic từ service, agent relay 1 lần
+  let voucherHint: string | null = null;
+  try {
+    voucherHint = (await findVoucherOpportunity(totals.subtotalVnd))?.hint ?? null;
+  } catch {
+    voucherHint = null;
+  }
+
   return {
     lines,
     subtotal: fmtVnd(totals.subtotalVnd),
     shipping: fmtVnd(totals.shippingFeeVnd),
     discount: totals.discountVnd > 0 ? "-" + fmtVnd(totals.discountVnd) : null,
     voucherExplanation,
+    voucherHint,
     total: fmtVnd(totals.totalVnd),
     itemCount: cart.items.reduce((n, i) => n + i.quantity, 0),
   };
