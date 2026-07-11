@@ -17,7 +17,7 @@ export function Slide({ children, footer, dark = false }: { children: ReactNode;
       <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-[#C8102E] via-[#E4572E] to-[#F2A33C]" />
       <div className="flex min-h-0 flex-1 flex-col px-16 pb-10 pt-12">{children}</div>
       <div className={`flex items-center justify-between px-16 pb-6 text-[11px] font-bold uppercase tracking-[0.18em] ${dark ? "text-white/40" : "text-[#1A2233]/35"}`}>
-        <span>KFC Ordering Agent · AABW 2026 · F&B Track</span>
+        <span>KFC Ordering Agent · AABW 2026 · F&B powered by KFC</span>
         <span>{footer ?? ""}</span>
       </div>
     </section>

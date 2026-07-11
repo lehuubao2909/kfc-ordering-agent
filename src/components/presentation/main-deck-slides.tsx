@@ -16,7 +16,7 @@ export const mainDeckSlides = [
         {["Domain F&B", "AI Engineering", "Product"].map((c) => (
           <span key={c} className="rounded-full border border-[#1A2233]/15 bg-white px-4 py-2 text-[14px] font-black">{c}</span>
         ))}
-        <span className="rounded-full bg-[#C8102E] px-4 py-2 text-[14px] font-black text-white">Track F&B · KFC Vietnam · P4 Conversational Ordering</span>
+        <span className="rounded-full bg-[#C8102E] px-4 py-2 text-[14px] font-black text-white">F&B powered by KFC · Problem 4: AI-powered conversational ordering via chat</span>
       </div>
     </div>
   </Slide>,

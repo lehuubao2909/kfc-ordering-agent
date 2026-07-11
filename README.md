@@ -2,7 +2,7 @@
 
 **AI agent đặt hàng KFC bằng tiếng Việt qua Facebook Messenger** — khách trò chuyện tự nhiên, agent tư vấn menu, gợi ý món theo ngữ cảnh, chốt đơn, thanh toán và cập nhật giao hàng theo thời gian thực.
 
-> Bài dự thi **Agentic AI Build Week 2026** (GenAI Fund) · Track **F&B — KFC Vietnam** · Problem **P4: AI-powered conversational ordering** · Team **GOKU**
+> Bài dự thi **Agentic AI Build Week 2026** (GenAI Fund) · Track **"F&B powered by KFC"** · Problem 4: **"AI-powered conversational ordering via chat"** · Team **GOKU**
 
 ---
 
