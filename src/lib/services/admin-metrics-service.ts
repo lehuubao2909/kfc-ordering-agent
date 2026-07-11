@@ -9,12 +9,15 @@ import { db } from "@/lib/db/client";
 import { orders, sessions } from "@/lib/db/schema";
 import { Order } from "@/lib/types";
 import backtest from "@/fixtures/funnel-backtest.json";
+import evalResults from "@/fixtures/eval-results.json"; // Dev B ghi đè bằng `npm run eval` (nluEval card)
+import { getStoreById } from "./store-service"; // cached in-memory — enrich storeName không tốn query
 
-export type AdminOrder = Order & { upsellAccepted: boolean };
+export type AdminOrder = Order & { upsellAccepted: boolean; storeName: string | null };
 export type AdminMetrics = {
   funnel: { conversationsStarted: number; reachedCart: number; confirmed: number; paid: number; delivered: number };
   aov: { withoutUpsellVnd: number; withUpsellVnd: number; upliftPct: number; assumption: string };
   upsell: { offered: number; accepted: number; acceptanceRatePct: number };
+  nluEval: { passed: number; total: number; comment: string }; // total=0 → UI ẩn card
 };
 export type OrdersOverview = { orders: AdminOrder[]; metrics: AdminMetrics };
 
@@ -43,23 +46,30 @@ export async function getOrdersOverview(limit = 50): Promise<OrdersOverview> {
   const offered = o.confirmed;
   const accepted = o.accepted;
 
-  const orderList: AdminOrder[] = orderRows.map((r) => ({
-    id: r.id,
-    psid: r.psid,
-    items: r.items,
-    subtotalVnd: r.subtotalVnd,
-    discountVnd: r.discountVnd,
-    shippingFeeVnd: r.shippingFeeVnd,
-    totalVnd: r.totalVnd,
-    voucherCode: r.voucherCode,
-    paymentMethod: r.paymentMethod as Order["paymentMethod"],
-    status: r.status as Order["status"],
-    deliveryAddress: r.deliveryAddress,
-    deliveryPhone: r.deliveryPhone,
-    createdAt: r.createdAt.toISOString(),
-    updatedAt: r.updatedAt.toISOString(),
-    upsellAccepted: r.upsellAccepted,
-  }));
+  // storeName enrich qua getStoreById (cache in-memory) — không tốn thêm query per-order
+  const orderList: AdminOrder[] = [];
+  for (const r of orderRows) {
+    const store = r.storeId ? await getStoreById(r.storeId) : null;
+    orderList.push({
+      id: r.id,
+      psid: r.psid,
+      items: r.items,
+      subtotalVnd: r.subtotalVnd,
+      discountVnd: r.discountVnd,
+      shippingFeeVnd: r.shippingFeeVnd,
+      totalVnd: r.totalVnd,
+      voucherCode: r.voucherCode,
+      paymentMethod: r.paymentMethod as Order["paymentMethod"],
+      status: r.status as Order["status"],
+      storeId: r.storeId,
+      deliveryAddress: r.deliveryAddress,
+      deliveryPhone: r.deliveryPhone,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+      upsellAccepted: r.upsellAccepted,
+      storeName: store?.name ?? null,
+    });
+  }
 
   return {
     orders: orderList,
@@ -81,6 +91,11 @@ export async function getOrdersOverview(limit = 50): Promise<OrdersOverview> {
         offered,
         accepted,
         acceptanceRatePct: offered ? Math.round((accepted / offered) * 1000) / 10 : 0,
+      },
+      nluEval: {
+        passed: evalResults.passed,
+        total: evalResults.total,
+        comment: evalResults.comment,
       },
     },
   };

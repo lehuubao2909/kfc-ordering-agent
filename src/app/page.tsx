@@ -13,7 +13,8 @@ const steps = [
 ] as const;
 
 export default async function LandingPage() {
-  const messengerUrl = process.env.NEXT_PUBLIC_MESSENGER_URL ?? "https://m.me/kfcvietnam?ref=aabw-demo";
+  // Fallback = page id AABW GOKU DEMO thật; production nên set NEXT_PUBLIC_MESSENGER_URL trên Vercel
+  const messengerUrl = process.env.NEXT_PUBLIC_MESSENGER_URL ?? "https://m.me/1158293564041042?ref=aabw-demo";
   const qrDataUrl = await QRCode.toDataURL(messengerUrl, { width: 360, margin: 2, color: { dark: "#18181b", light: "#ffffff" } });
 
   return (
@@ -23,7 +24,7 @@ export default async function LandingPage() {
         <div className="ambient-orb absolute -right-28 top-24 -z-10 size-80 rounded-full bg-red-700/30 blur-3xl" aria-hidden="true" />
         <nav className="mx-auto flex max-w-7xl items-center justify-between" aria-label="Điều hướng chính">
           <BrandMark inverse />
-          <Link href="/order/KFC-0001" className="rounded-full border border-white/20 px-4 py-2 text-sm font-bold text-white transition-colors duration-200 hover:border-white/50 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white">Xem đơn mẫu</Link>
+          <Link href="/staff" className="rounded-full border border-white/20 px-4 py-2 text-sm font-bold text-white transition-colors duration-200 hover:border-white/50 hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white">Staff Console</Link>
         </nav>
 
         <div className="mx-auto mt-14 grid max-w-7xl items-center gap-12 lg:grid-cols-[1fr_420px] lg:gap-20">

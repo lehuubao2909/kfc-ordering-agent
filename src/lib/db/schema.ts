@@ -45,6 +45,20 @@ export const vouchers = pgTable("vouchers", {
   active: boolean("active").notNull().default(true),
 });
 
+// Cửa hàng KFC (store-aware ordering): resolve theo alias quận từ text địa chỉ, check giờ mở + món hết.
+export const stores = pgTable("stores", {
+  id: text("id").primaryKey(), // "kfc-nguyen-trai-q5"
+  name: text("name").notNull(),
+  address: text("address").notNull(),
+  district: text("district").notNull(),
+  districtAliases: jsonb("district_aliases").$type<string[]>().notNull().default([]),
+  openHour: integer("open_hour").notNull(),
+  closeHour: integer("close_hour").notNull(),
+  active: boolean("active").notNull().default(true),
+  unavailableItemIds: jsonb("unavailable_item_ids").$type<string[]>().notNull().default([]),
+  isFlagship: boolean("is_flagship").notNull().default(false),
+});
+
 // Khách theo PSID Messenger; lưu địa chỉ/SĐT lần gần nhất để reorder nhanh
 export const customers = pgTable("customers", {
   psid: text("psid").primaryKey(),
@@ -61,6 +75,7 @@ export const sessions = pgTable("sessions", {
   mode: text("mode").notNull().default("agent"), // agent | human (handoff)
   cart: jsonb("cart").$type<{ items: { itemId: string; quantity: number; note?: string }[]; voucherCode?: string }>().notNull().default({ items: [] }),
   activeOrderId: text("active_order_id"),
+  storeId: text("store_id"), // cửa hàng resolve được từ địa chỉ giao (set_delivery_info)
   history: jsonb("history").$type<{ role: string; content: string }[]>().notNull().default([]),
   processingUntil: timestamp("processing_until"), // lock: đang xử lý tới thời điểm này, steal sau 60s
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
@@ -79,6 +94,7 @@ export const orders = pgTable("orders", {
   voucherCode: text("voucher_code"),
   paymentMethod: text("payment_method"), // cod | qr | card
   status: text("status").notNull(), // OrderState từ PLACED trở đi (+ AWAITING_PAYMENT, CANCELLED)
+  storeId: text("store_id"), // cửa hàng phục vụ — copy từ sessions.storeId lúc tạo đơn
   deliveryAddress: text("delivery_address"),
   deliveryPhone: text("delivery_phone"),
   upsellAccepted: boolean("upsell_accepted").notNull().default(false), // metric cho admin

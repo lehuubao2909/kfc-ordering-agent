@@ -71,7 +71,7 @@ UI tracking (/order) hiển thị timeline: PLACED → PREPARING → DELIVERING 
 ### promotions
 `id PK, title, description, discountType, discountValue, active` — agent giới thiệu khi khách hỏi ưu đãi.
 
-### stores — cửa hàng KFC (MỚI 11/7: store-aware ordering — ⚠️ Dev A CHƯA implement, xem gate 18:00)
+### stores — cửa hàng KFC (✅ ĐÃ implement + seed 11/7 — store-service, smoke test pass)
 | Cột | Kiểu | Ghi chú |
 |---|---|---|
 | id | text PK | `kfc-nguyen-trai-q5` |

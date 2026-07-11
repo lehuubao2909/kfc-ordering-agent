@@ -89,12 +89,36 @@ export const OrderSchema = z.object({
   voucherCode: z.string().nullable().default(null),
   paymentMethod: PaymentMethodSchema.nullable().default(null),
   status: OrderStateSchema,
+  storeId: z.string().nullable().default(null), // cửa hàng phục vụ (resolve từ địa chỉ)
   deliveryAddress: z.string().nullable().default(null),
   deliveryPhone: z.string().nullable().default(null),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
 export type Order = z.infer<typeof OrderSchema>;
+
+// ===== Store (store-aware ordering 11/7) =====
+export const StoreSchema = z.object({
+  id: z.string(), // "kfc-nguyen-trai-q5"
+  name: z.string(),
+  address: z.string(),
+  district: z.string(),
+  districtAliases: z.array(z.string()).default([]), // match text địa chỉ, KHÔNG geocoding
+  openHour: z.number().int().min(0).max(23),
+  closeHour: z.number().int().min(0).max(24),
+  active: z.boolean().default(true),
+  unavailableItemIds: z.array(z.string()).default([]), // SPARSE: chỉ món HẾT tại cửa hàng này
+  isFlagship: z.boolean().optional(), // cửa hàng mặc định khi không match được quận
+});
+export type Store = z.infer<typeof StoreSchema>;
+
+/** Kết quả resolve cửa hàng khi khách đưa địa chỉ — agent relay tự nhiên cho khách. */
+export type StoreResolution = {
+  store: Store;
+  storeWasOpen: boolean; // false → store trả về là cửa hàng thay thế/flagship
+  fallbackUsed: boolean; // true → không match được quận, dùng flagship
+  unavailableItemIds: string[]; // món trong GIỎ bị hết tại cửa hàng này
+};
 
 // ===== API envelope thống nhất mọi route =====
 export type ApiEnvelope<T> =

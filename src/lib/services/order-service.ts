@@ -49,6 +49,7 @@ function rowToOrder(r: typeof orders.$inferSelect): Order {
     voucherCode: r.voucherCode,
     paymentMethod: r.paymentMethod,
     status: r.status,
+    storeId: r.storeId,
     deliveryAddress: r.deliveryAddress,
     deliveryPhone: r.deliveryPhone,
     createdAt: r.createdAt.toISOString(),
@@ -127,6 +128,7 @@ export async function createOrderFromSession(psid: string, paymentMethod: Paymen
         voucherCode: totals.voucherCode,
         paymentMethod,
         status,
+        storeId: session.storeId ?? null, // cửa hàng resolve từ địa chỉ (store-service); null → chưa qua flow store
         deliveryAddress: customer.lastAddress,
         deliveryPhone: customer.phone,
       })

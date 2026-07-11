@@ -6,6 +6,7 @@
  */
 import { NextRequest } from "next/server";
 import { getOrderById } from "@/lib/services/order-service";
+import { getStoreById } from "@/lib/services/store-service";
 import { fail, handleError, ok } from "../../_lib/route-utils";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -13,7 +14,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const { id } = await params;
     const order = await getOrderById(id);
     if (!order) return fail("NOT_FOUND", `Không tìm thấy đơn ${id}.`, 404);
-    return ok(order);
+    // Kèm cửa hàng phục vụ (store-aware flow) — null nếu đơn tạo trước khi có store layer
+    const store = order.storeId ? await getStoreById(order.storeId) : null;
+    return ok({ ...order, store: store ? { id: store.id, name: store.name, address: store.address, closeHour: store.closeHour } : null });
   } catch (err) {
     return handleError(err);
   }

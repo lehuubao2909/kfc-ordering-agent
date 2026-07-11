@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import type { MockOrder } from "@/lib/mock/mock-data-types";
+import type { Order } from "@/lib/types";
 import { currencyFormatter } from "@/components/shared/formatters";
 
 type PaymentTab = "qr" | "card";
 
-export function PaymentPanel({ order, qrDataUrl }: { order: MockOrder; qrDataUrl: string }) {
+export function PaymentPanel({ order, qrDataUrl }: { order: Order; qrDataUrl: string }) {
   const [tab, setTab] = useState<PaymentTab>(order.paymentMethod === "card" ? "card" : "qr");
   const [state, setState] = useState<"idle" | "submitting" | "success" | "error">("idle");
 
@@ -17,7 +17,7 @@ export function PaymentPanel({ order, qrDataUrl }: { order: MockOrder; qrDataUrl
     setState("submitting");
     try {
       const response = await fetch("/api/payment/confirm", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId: order.id }) });
-      if (!response.ok && response.status !== 501) throw new Error("PAYMENT_CONFIRM_FAILED");
+      if (!response.ok) throw new Error("PAYMENT_CONFIRM_FAILED");
       setState("success");
     } catch { setState("error"); }
   }

@@ -5,25 +5,33 @@
  */
 import { desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { messageLog, sessions } from "@/lib/db/schema";
+import { customers, messageLog, sessions } from "@/lib/db/schema";
 
 export type ConversationSummary = {
   psid: string;
+  customerName: string; // từ customers.name; chưa có → "Khách •••1234"
   state: string;
   mode: string;
   activeOrderId: string | null;
   cartCount: number;
+  lastMessage: string; // tin cuối trong sessions.history (preview ở list)
   updatedAt: string;
 };
 
 export async function listConversations(): Promise<ConversationSummary[]> {
-  const rows = await db.select().from(sessions).orderBy(desc(sessions.updatedAt));
-  return rows.map((s) => ({
+  const rows = await db
+    .select({ s: sessions, customerName: customers.name })
+    .from(sessions)
+    .leftJoin(customers, eq(customers.psid, sessions.psid))
+    .orderBy(desc(sessions.updatedAt));
+  return rows.map(({ s, customerName }) => ({
     psid: s.psid,
+    customerName: customerName ?? `Khách •••${s.psid.slice(-4)}`,
     state: s.state,
     mode: s.mode,
     activeOrderId: s.activeOrderId,
     cartCount: s.cart?.items?.length ?? 0,
+    lastMessage: s.history?.at(-1)?.content ?? "",
     updatedAt: s.updatedAt.toISOString(),
   }));
 }

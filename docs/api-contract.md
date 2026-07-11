@@ -23,9 +23,9 @@ MỚI 11/7: thêm transition COLLECTING_DELIVERY → CONFIRMING (store resolve p
 ```
 { store: {id, name, closeHour}, storeWasOpen: bool, unavailableItemIds: string[], fallbackUsed: bool }
 ```
-- store-service (Dev A): `resolveStoreForAddress(address, now)` — match districtAliases từ text (KHÔNG geocoding), ưu tiên đang mở; đóng/không match → flagship + `fallbackUsed`. `getUnavailableCartItems(storeId, cart)`.
-- Agent (Dev B): relay tự nhiên — "Cửa hàng KFC Nguyễn Trãi (mở đến 22h) sẽ chuẩn bị đơn ạ". Món hết → quay CONFIRMING, gợi ý món thay cùng category (dùng get_upsell_suggestions). Cửa hàng gần đóng (<30') → nhắc khách.
-- **ADDITIVE — Gate 18:00:** store-service chưa xong → set_delivery_info trả flagship mặc định, flow không đổi. Golden path KHÔNG phụ thuộc lớp này.
+- ✅ **ĐÃ implement (11/7, smoke pass):** `store-service.ts` — Dev B tool `set_delivery_info` CHỈ CẦN GỌI **`applyDeliveryInfo(psid, {phone, address, name?})`** → tự lưu customer + resolve store + ghi sessions.storeId + trả `StoreResolution` (types.ts). Giờ mở cửa tính theo Asia/Ho_Chi_Minh sẵn.
+- Agent (Dev B): relay tự nhiên — "Cửa hàng KFC Nguyễn Trãi (mở đến 22h) sẽ chuẩn bị đơn ạ". `unavailableItemIds` không rỗng → quay CONFIRMING gợi ý món thay (get_upsell_suggestions). `storeWasOpen=false` → báo khách "cửa hàng gần anh/chị đã đóng, đơn chuyển về [store.name]".
+- `GET /api/orders/{id}` giờ trả thêm `store: {id, name, address, closeHour} | null`; admin orders có `storeName`.
 
 ## HTTP routes
 

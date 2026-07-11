@@ -6,9 +6,13 @@
 import "./load-env"; // PHẢI đứng trước mọi import đụng env
 
 import { db } from "../src/lib/db/client";
-import { menuItems, vouchers, promotions } from "../src/lib/db/schema";
-import { MenuItemSchema } from "../src/lib/types";
+import { menuItems, vouchers, promotions, stores, loyaltyAccounts } from "../src/lib/db/schema";
+import { MenuItemSchema, StoreSchema } from "../src/lib/types";
 import menuFixture from "../src/fixtures/menu-sample.json";
+import storesFixture from "../src/fixtures/stores-sample.json";
+// Loyalty demo: SĐT dùng trong kịch bản demo phải có sẵn điểm (beat "anh có 1.250 điểm").
+// Chung fixture với reset-demo-data để reset xong điểm demo vẫn còn.
+import LOYALTY_DEMO_SEED from "../src/fixtures/loyalty-demo-accounts.json";
 
 // 3–4 mã mẫu — autoApplyBestVoucher sẽ chọn mã giảm nhiều nhất trong số thỏa minOrder.
 const VOUCHER_SEED = [
@@ -68,6 +72,29 @@ async function main() {
   await db.delete(promotions);
   for (const p of PROMOTION_SEED) {
     await db.insert(promotions).values(p);
+  }
+
+  const storeRows = storesFixture.map((s) => StoreSchema.parse(s));
+  console.log(`Seeding ${storeRows.length} cửa hàng...`);
+  for (const s of storeRows) {
+    const values = {
+      id: s.id,
+      name: s.name,
+      address: s.address,
+      district: s.district,
+      districtAliases: s.districtAliases,
+      openHour: s.openHour,
+      closeHour: s.closeHour,
+      active: s.active,
+      unavailableItemIds: s.unavailableItemIds,
+      isFlagship: s.isFlagship ?? false,
+    };
+    await db.insert(stores).values(values).onConflictDoUpdate({ target: stores.id, set: values });
+  }
+
+  console.log(`Seeding ${LOYALTY_DEMO_SEED.length} loyalty demo account...`);
+  for (const l of LOYALTY_DEMO_SEED) {
+    await db.insert(loyaltyAccounts).values(l).onConflictDoUpdate({ target: loyaltyAccounts.phone, set: { points: l.points } });
   }
 
   console.log("✅ Seed xong.");
