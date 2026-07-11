@@ -44,16 +44,25 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 function buildAllTools(psid: string): ToolSet {
   return {
     get_menu: tool({
-      description: "Tra cứu menu KFC. Truyền query (tên/từ khoá món) hoặc category. Kết quả kèm carousel ảnh gửi cho khách.",
+      description:
+        "Tra cứu menu KFC — GỌI TOOL NÀY mỗi khi khách muốn xem menu/món có gì/xin hình menu. Xem toàn menu (không query) → hệ thống TỰ ĐỘNG gửi kèm ẢNH POSTER MENU + carousel cho khách.",
       inputSchema: z.object({
         query: z.string().optional().describe("từ khoá tên món, vd 'gà rán', 'pepsi'"),
         category: z.enum(["combo", "chicken", "burger-rice", "snack", "dessert", "drink"]).optional(),
       }),
       execute: async ({ query, category }) => {
-        const items = query ? await searchMenuItems(query) : category ? await getMenuByCategory(category) : await getFullMenu();
+        let items = query ? await searchMenuItems(query) : category ? await getMenuByCategory(category) : await getFullMenu();
+        if (!query) {
+          // Browse (toàn menu/category): combo poster lên đầu — fix 11/7 đêm: món mới nằm cuối
+          // danh sách 67 món nên không bao giờ lọt top-10 carousel.
+          const featured = new Set(["combo-2-ga-ran", "combo-burger", "combo-burger-phile-ga-quay", "combo-mi-y-ga-ran", "combo-com-ga-ran", "combo-com-phile-ga-quay", "bucket-3", "bucket-4", "bucket-5", "bucket-6"]);
+          items = [...items.filter((m) => featured.has(m.id)), ...items.filter((m) => !featured.has(m.id))];
+        }
         return {
           items: items.slice(0, 10).map((m) => ({ id: m.id, name: m.name, price: fmtVnd(m.priceVnd), category: m.category, description: m.description })),
-          note: items.length ? "Đã gửi kèm carousel ảnh. Giới thiệu ngắn gọn 1-2 món nổi bật." : "Không tìm thấy món khớp, hỏi lại khách hoặc gợi ý món khác.",
+          note: items.length
+            ? (query ? "" : "Ảnh poster menu + carousel ĐÃ được hệ thống tự gửi kèm — ĐỪNG nói không gửi được hình. ") + "Giới thiệu ngắn gọn 1-2 món nổi bật."
+            : "Không tìm thấy món khớp, hỏi lại khách hoặc gợi ý món khác.",
         };
       },
     }),
