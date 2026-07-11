@@ -18,7 +18,14 @@ import { buildToolTrace } from "./agent-trace-detail";
 import { buildSystemPrompt } from "./agent-system-prompt-vi";
 import { getCustomer } from "@/lib/services/session-data-service";
 
-export type AgentReply = { text: string; handedOff: boolean; carouselItemIds?: string[]; toolTrace?: string[] };
+export type AgentReply = {
+  text: string;
+  handedOff: boolean;
+  carouselItemIds?: string[];
+  toolTrace?: string[];
+  /** Khách xem menu TỔNG (get_menu không query cụ thể) → webhook gửi kèm poster /menu.jpeg */
+  sendMenuImage?: boolean;
+};
 
 const GRACEFUL = "Dạ em bị chậm xíu, anh/chị nhắn lại giúp em ạ 🙏";
 const DEFAULT_MODEL = "gpt-4o-mini";
@@ -71,6 +78,11 @@ export async function runOrderingAgentTurn(psid: string, userMessages: string[])
     if (Array.isArray(items) && items.length) carouselItemIds = items.slice(0, 10).map((i) => i.id);
   }
 
+  // Xem menu tổng quát (không search món cụ thể) → gửi kèm poster menu cho hấp dẫn
+  const sendMenuImage = toolCalls.some(
+    (c) => c.toolName === "get_menu" && !(c.input as { query?: string } | undefined)?.query
+  );
+
   const text =
     (result.text || "").trim() ||
     (handedOff ? "Dạ em kết nối anh/chị với nhân viên hỗ trợ ngay ạ." : "Dạ em chưa rõ ý, anh/chị nói lại giúp em nhé.");
@@ -86,5 +98,5 @@ export async function runOrderingAgentTurn(psid: string, userMessages: string[])
   // (rubric AABW: "make your reasoning and multi-step actions visible").
   const toolTrace = buildToolTrace(toolCalls, toolResults);
 
-  return { text, handedOff, carouselItemIds, toolTrace };
+  return { text, handedOff, carouselItemIds, toolTrace, sendMenuImage };
 }

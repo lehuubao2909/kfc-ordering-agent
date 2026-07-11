@@ -11,6 +11,7 @@ import {
   sendTypingIndicator,
   sendMenuCarousel,
   sendQuickReplies,
+  sendImageMessage,
 } from "@/lib/channels/messenger-adapter";
 import { registerOrderStatusNotifications } from "@/lib/channels/notification-sender";
 import { runOrderingAgentTurn } from "@/lib/agent/ordering-agent-core";
@@ -148,6 +149,12 @@ async function handleIncoming({ psid, mid, text }: ParsedEvent): Promise<void> {
 
     // Trace tools cho staff console (giám khảo thấy agent hành động) — ghi TRƯỚC reply để hiện đúng thứ tự
     if (reply.toolTrace?.length) await recordAgentTrace(psid, reply.toolTrace).catch(() => {});
+
+    // Khách xem menu tổng → gửi poster menu trước cho bắt mắt (rồi mới tới text + carousel)
+    if (reply.sendMenuImage) {
+      const base = process.env.NEXT_PUBLIC_APP_URL ?? "https://kfc-ordering-agent.vercel.app";
+      await sendImageMessage(psid, `${base}/menu.jpeg`).catch((err) => console.error("gửi poster menu lỗi (bỏ qua):", err));
+    }
 
     if (reply.text) {
       const state = (await getSession(psid)).state;

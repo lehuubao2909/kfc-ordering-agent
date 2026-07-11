@@ -44,6 +44,15 @@ export async function sendOrderUpdateMessage(recipientPsid: string, text: string
   });
 }
 
+/** Gửi 1 ảnh (URL public) — dùng cho poster menu khi khách xem menu tổng. */
+export async function sendImageMessage(recipientPsid: string, imageUrl: string): Promise<void> {
+  await callSendApi({
+    recipient: { id: recipientPsid },
+    message: { attachment: { type: "image", payload: { url: imageUrl, is_reusable: true } } },
+    messaging_type: "RESPONSE",
+  });
+}
+
 /** Carousel menu — generic template ≤10 cards (ảnh, giá, nút postback "Thêm món này"). */
 export async function sendMenuCarousel(recipientPsid: string, itemIds: string[]): Promise<void> {
   const resolved = await Promise.all(itemIds.slice(0, 10).map((id) => getMenuItemById(id)));
