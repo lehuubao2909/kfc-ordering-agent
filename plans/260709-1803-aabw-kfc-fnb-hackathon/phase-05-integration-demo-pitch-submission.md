@@ -24,15 +24,33 @@
 | **08:00–08:30** | **NỘP PORTAL** + screenshot xác nhận | Người 4 |
 | 08:30–09:00 | Setup booth: điện thoại, QR standee, hotspot 4G test, máy chiếu | Cả 4 |
 
-## Pitch
+## Pitch (CẬP NHẬT 11/7 chiều theo Pitching Guide chính thức)
 
-**Round 1 (3' + 1' Q&A):**
-- 0:00–0:20 Hook: ảnh fanpage KFC tin nhắn khách chờ — "hôm nay, 100% trả lời tay".
-- 0:20–0:50 Problem (đề bài): khách high-intent ở sẵn trong chat nhưng phải rời app để đặt → mất chuyển đổi; KFC xác nhận có API.
-- 0:50–2:20 **Video 90"**: đặt hàng tiếng Việt → upsell → QR thanh toán → push trạng thái → handoff nhân viên → admin funnel.
-- 2:20–3:00 KPI khớp đề (completion, NLU 18/20, voucher, loyalty) + kiến trúc 1 slide + roadmap (kiosk P2 cùng engine, VNPay/MoMo, Zalo cùng adapter).
+**Round 1 = 8' total: 5' pitch + 2' Q&A + 1' chuyển tiếp. Round 2 = 12'. Rehearse tới 4:45.**
+Lịch Demo Day: 09:00 check-in (BẮT BUỘC ≥1 người, vắng = loại) · 10:15–12:15 R1 · 13:15 R2 (top 5) · 14:45 Finals (top 1) · 16:00 Awards.
 
-**Round 2 (7' + 3' Q&A):** live toàn bộ — giám khảo quét QR **tự đặt trên điện thoại họ** (Người 2 hỗ trợ), staff console advance status → push nổi lên máy giám khảo (khoảnh khắc mạnh nhất), handoff live, admin live; slide kiến trúc sâu (state machine + LLM hybrid, guardrails, per-user lock/queue, message tags); business case; roadmap.
+**Deck 6 slides theo guide (Five-Minute Map):**
+1. **0:00–0:40 TEAM + PROMISE:** "Với khách KFC đang chat sẵn trên Messenger, chúng tôi biến hội thoại thành đơn hàng hoàn chỉnh bằng AI agent tự lập kế hoạch và hành động." + credibility line team.
+2. **0:40–1:20 PROBLEM INSIGHT:** "We discovered..." không lặp brief — insight: khách high-intent NHẮN TIN trước khi mở app; hiện 100% trả lời tay → nghẽn ở tốc độ người trực page. 1 insight > 5 số liệu.
+3. **1:20–2:20 AGENTIC WORKFLOW (slide sống còn):** Goal → Plan → Tools → Act → Verify trên flow thật: khách nhắn → agent chọn tool (14 tools state-gated) → resolve cửa hàng/tồn kho → verify bằng service layer → tạo đơn. **Chiếu tool-trace 🔧 trên staff console làm bằng chứng thị giác** — "đây không phải chatbot trả lời, đây là agent hành động".
+4. **2:20–3:05 WHY IT WINS:** state machine giữ tiền + LLM giữ hội thoại (không bịa giá) · store-aware 250 cửa hàng · handoff người thật · dịch mọi feature sang giá trị: "khách chốt đơn trong chat chưa đầy 2 phút, không cần app".
+5. **3:05–3:50 EVIDENCE + IMPACT (dán nhãn level trung thực theo guide):** Level 2 Benchmark: **eval 24/24 NLU tiếng Việt** (có case bẫy chống bịa) · Level 1 Assumption (ghi rõ): AOV +2.7% backtest thận trọng, KFC ước tính 10–15% · công thức ROI.
+6. **3:50–4:50 DEMO 60" theo storyline guide:** Goal (khách đói nhắn tin) → Trigger → Agent Acts (chiếu song song điện thoại + staff console tool-trace) → Outcome (mã đơn + push) → Proof (admin funnel). KHÔNG show login/setup. Kết ở outcome khách.
+
+**Q&A 2': dùng chiến thuật guide — "Cho phép em gom câu hỏi trước ạ?" (0:20 gom, 1:20 trả lời theo nhóm).**
+
+**Round 2 (12'):** mở rộng — giám khảo quét QR tự đặt trên điện thoại họ (Người 2 hỗ trợ), staff advance → push nổi máy giám khảo, handoff live, kiến trúc sâu, business case, roadmap P2 kiosk/P1/P3.
+
+## Checklist NỘP PORTAL (mỗi field = 1 mục thật trên form)
+
+- [ ] **Track confirmation** — deadline 15:00 11/7 (⚠️ VERIFY NGAY, miss = không được chấm)
+- [ ] Demo URL: test **incognito** ngay trước khi nộp (landing phải tự giải thích; ghi creds admin demo vào description/README)
+- [ ] **Repo chuyển PUBLIC** + README hướng dẫn chạy đầy đủ + rà secrets lần cuối trước khi flip
+- [ ] **3–5 screenshots tỷ lệ 3:2** (chat đặt hàng, tool-trace staff console, admin funnel, tracking page, /pay)
+- [ ] **Video 2–3 phút** product working (KHÔNG narrate slides) — dùng luôn làm video backup R1
+- [ ] **Partner tools**: tick đúng những gì THẬT SỰ dùng (OpenAI, Vercel, Neon nếu có trong list) + mô tả cụ thể vai trò từng tool
+- [ ] Official Rules checkbox (đọc rồi mới tick) · Public visibility checkbox · Review màn final trước khi confirm
+- [ ] Phân công người check-in on-site 09:00 sáng 12/7
 
 **Q&A drill:**
 1. "Mock data chứng minh gì?" → Kiến trúc thật + Messenger thật + payment/OMS là contract sẵn; pilot chỉ là đổi endpoint.

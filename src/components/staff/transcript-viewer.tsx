@@ -30,17 +30,27 @@ export function TranscriptViewer({ customerName, entries }: { customerName: stri
         {entries.length === 0 ? (
           <p className="py-10 text-center text-sm text-zinc-400">Chưa có tin nhắn — hội thoại sẽ hiện khi khách nhắn vào page.</p>
         ) : (
-          entries.map((message, index) => (
-            <div key={`${index}-${message.createdAt}`} className={`flex min-w-0 ${message.direction === "in" ? "justify-start" : "justify-end"}`}>
-              <div
-                className={`min-w-0 max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm leading-6 shadow-sm sm:max-w-[72%] sm:px-4 sm:py-3 ${
-                  message.direction === "in" ? "rounded-bl-md bg-white text-zinc-800" : "rounded-br-md bg-zinc-900 text-white"
-                }`}
-              >
-                <span className="break-words">{maskSensitiveText(message.text)}</span>
+          entries.map((message, index) =>
+            message.direction === "trace" ? (
+              // Chuỗi tools agent gọi trong turn — bằng chứng agentic hiển thị (rubric AABW)
+              <div key={`${index}-${message.createdAt}`} className="flex min-w-0 justify-center py-1">
+                <span className="inline-flex max-w-full items-center gap-1.5 break-words rounded-full border border-violet-200 bg-violet-50 px-3 py-1 font-mono text-[11px] font-semibold text-violet-700">
+                  <span aria-hidden="true">🔧</span>
+                  <span className="break-all">{message.text}</span>
+                </span>
               </div>
-            </div>
-          ))
+            ) : (
+              <div key={`${index}-${message.createdAt}`} className={`flex min-w-0 ${message.direction === "in" ? "justify-start" : "justify-end"}`}>
+                <div
+                  className={`min-w-0 max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm leading-6 shadow-sm sm:max-w-[72%] sm:px-4 sm:py-3 ${
+                    message.direction === "in" ? "rounded-bl-md bg-white text-zinc-800" : "rounded-br-md bg-zinc-900 text-white"
+                  }`}
+                >
+                  <span className="break-words">{maskSensitiveText(message.text)}</span>
+                </div>
+              </div>
+            )
+          )
         )}
       </div>
     </div>

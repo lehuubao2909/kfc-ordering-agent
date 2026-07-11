@@ -46,3 +46,10 @@ export async function markMessagesProcessed(ids: number[]): Promise<void> {
 export async function recordOutgoingMessage(psid: string, text: string): Promise<void> {
   await db.insert(messageLog).values({ psid, mid: null, direction: "out", text, processed: true });
 }
+
+/** Ghi chuỗi tools agent đã gọi trong 1 turn (direction "trace") — staff console render thành chip
+ * "🔧 get_menu → add_to_cart" để giám khảo THẤY hành động agentic (rubric AABW). */
+export async function recordAgentTrace(psid: string, toolNames: string[]): Promise<void> {
+  if (!toolNames.length) return;
+  await db.insert(messageLog).values({ psid, mid: null, direction: "trace", text: toolNames.join(" → "), processed: true });
+}

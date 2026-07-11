@@ -17,7 +17,7 @@ import { getToolsForState } from "./agent-tools-by-state";
 import { buildSystemPrompt } from "./agent-system-prompt-vi";
 import { getCustomer } from "@/lib/services/session-data-service";
 
-export type AgentReply = { text: string; handedOff: boolean; carouselItemIds?: string[] };
+export type AgentReply = { text: string; handedOff: boolean; carouselItemIds?: string[]; toolTrace?: string[] };
 
 const GRACEFUL = "Dạ em bị chậm xíu, anh/chị nhắn lại giúp em ạ 🙏";
 const DEFAULT_MODEL = "gpt-4o-mini";
@@ -80,5 +80,9 @@ export async function runOrderingAgentTurn(psid: string, userMessages: string[])
   ].slice(-12);
   await saveSession({ ...session, history: newHistory });
 
-  return { text, handedOff, carouselItemIds };
+  // Trace tên tools đã gọi theo thứ tự — hiện lên staff console để giám khảo THẤY agent hành động
+  // (rubric AABW: "make your reasoning and multi-step actions visible").
+  const toolTrace = toolCalls.map((c) => c.toolName);
+
+  return { text, handedOff, carouselItemIds, toolTrace };
 }

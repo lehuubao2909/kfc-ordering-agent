@@ -24,6 +24,7 @@ import {
   peekUnprocessedMessages,
   markMessagesProcessed,
   recordOutgoingMessage,
+  recordAgentTrace,
 } from "@/lib/agent/incoming-message-queue";
 import { getMenuItemById } from "@/lib/services/menu-service";
 import { OrderState } from "@/lib/types";
@@ -144,6 +145,9 @@ async function handleIncoming({ psid, mid, text }: ParsedEvent): Promise<void> {
     const reply = await runOrderingAgentTurn(psid, messages);
     // Turn xong mới đánh dấu processed — lỗi giữa chừng thì tin còn nguyên để xử lý lại (không mất tin).
     await markMessagesProcessed(ids);
+
+    // Trace tools cho staff console (giám khảo thấy agent hành động) — ghi TRƯỚC reply để hiện đúng thứ tự
+    if (reply.toolTrace?.length) await recordAgentTrace(psid, reply.toolTrace).catch(() => {});
 
     if (reply.text) {
       const state = (await getSession(psid)).state;
