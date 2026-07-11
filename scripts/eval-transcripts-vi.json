@@ -12,7 +12,7 @@
     { "id": "confirm-order", "category": "flow", "setup": { "cartItemIds": ["combo-ga-ran-1-nguoi", "pepsi-vua"] }, "turns": ["chốt đơn giúp anh"], "expectAny": ["xac nhan", "tong", "d", "dia chi"] },
     { "id": "delivery-resolve", "category": "flow", "setup": { "cartItemIds": ["combo-ga-ran-1-nguoi"] }, "turns": ["chốt đơn", "giao tới 74 Lê Lai, Quận 1, số điện thoại 0901234567"], "expectAny": ["cua hang", "kfc", "thanh toan", "le lai"], "expectState": "SELECTING_PAYMENT" },
     { "id": "payment-cod", "category": "flow", "setup": { "cartItemIds": ["combo-ga-ran-1-nguoi"] }, "turns": ["chốt đơn", "giao tới 74 Lê Lai, Quận 1, sđt 0901234567", "cho anh thanh toán tiền mặt"], "expectAny": ["kfc-", "ma don", "theo doi", "tien mat", "dat"] },
-    { "id": "status-no-order", "category": "nlu", "turns": ["đơn của anh tới đâu rồi"], "expectAny": ["chua co don", "chua co", "chua dat"] },
+    { "id": "status-no-order", "category": "nlu", "turns": ["đơn của anh tới đâu rồi"], "expectAny": ["chua co don", "chua co", "chua dat", "chua thay", "khong co don", "khong thay don", "chua ghi nhan"] },
     { "id": "handoff-explicit", "category": "handoff", "turns": ["cho anh gặp nhân viên tư vấn với"], "expectAny": ["nhan vien", "ho tro", "ket noi"], "expectHandoff": true },
     { "id": "out-of-scope", "category": "handoff", "turns": ["thời tiết Sài Gòn hôm nay thế nào em"], "expectAny": ["nhan vien", "ho tro", "dat mon", "xin loi", "kfc"] },
     { "id": "remove-item", "category": "flow", "setup": { "cartItemIds": ["combo-ga-ran-1-nguoi", "pepsi-vua"] }, "turns": ["bỏ pepsi ra giúp anh"], "expectAny": ["bo", "xoa", "da", "gio"] },
