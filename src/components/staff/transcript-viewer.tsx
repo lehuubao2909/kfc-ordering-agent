@@ -3,6 +3,7 @@
 // Transcript từ message_log (nguồn chuẩn — KHÔNG dùng sessions.history): direction in = khách, out = bot/staff.
 import { useEffect, useRef } from "react";
 import { maskSensitiveText } from "@/components/shared/mask-sensitive-text";
+import { formatTraceLine } from "./tool-trace-labels";
 
 export type TranscriptEntry = { direction: string; text: string; createdAt: string };
 
@@ -32,11 +33,15 @@ export function TranscriptViewer({ customerName, entries }: { customerName: stri
         ) : (
           entries.map((message, index) =>
             message.direction === "trace" ? (
-              // Chuỗi tools agent gọi trong turn — bằng chứng agentic hiển thị (rubric AABW)
+              // Nhật ký quyết định của agent (Việt hoá) — bằng chứng agentic hiển thị (rubric AABW).
+              // Hover để xem tên tool kỹ thuật.
               <div key={`${index}-${message.createdAt}`} className="flex min-w-0 justify-center py-1">
-                <span className="inline-flex max-w-full items-center gap-1.5 break-words rounded-full border border-violet-200 bg-violet-50 px-3 py-1 font-mono text-[11px] font-semibold text-violet-700">
+                <span
+                  title={`Tools: ${formatTraceLine(message.text).raw}`}
+                  className="inline-flex max-w-full items-center gap-1.5 break-words rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-[11.5px] font-semibold text-violet-700"
+                >
                   <span aria-hidden="true">🔧</span>
-                  <span className="break-all">{message.text}</span>
+                  <span>{formatTraceLine(message.text).display}</span>
                 </span>
               </div>
             ) : (

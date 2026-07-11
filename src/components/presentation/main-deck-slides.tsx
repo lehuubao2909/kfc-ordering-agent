@@ -73,7 +73,7 @@ export const mainDeckSlides = [
     <div className="mt-5 grid grid-cols-[1fr_1fr] gap-4">
       <Card>
         <CardLabel>Nhìn thấy được — không phải hộp đen</CardLabel>
-        <p className="mt-2 text-[15px] leading-relaxed">Staff console hiện <b>tool-trace từng lượt</b>: <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 font-mono text-[12.5px] font-bold text-violet-700">🔧 set_delivery_info → select_payment_method</span> — giám khảo xem agent quyết định theo thời gian thực.</p>
+        <p className="mt-2 text-[15px] leading-relaxed">Staff console hiện <b>nhật ký quyết định từng lượt</b>: <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-[12px] font-bold text-violet-700">🔧 Lưu địa chỉ · chọn cửa hàng (KFC Nguyễn Trãi) → Tạo đơn & thanh toán (KFC-0001 · tiền mặt)</span> — giám khảo xem agent quyết định theo thời gian thực.</p>
       </Card>
       <Card>
         <CardLabel>Kỷ luật công cụ</CardLabel>

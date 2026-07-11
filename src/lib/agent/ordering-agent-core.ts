@@ -14,6 +14,7 @@ import { openai } from "@ai-sdk/openai";
 import { generateText, stepCountIs, type ModelMessage } from "ai";
 import { getSession, saveSession } from "./conversation-session-store";
 import { getToolsForState } from "./agent-tools-by-state";
+import { buildToolTrace } from "./agent-trace-detail";
 import { buildSystemPrompt } from "./agent-system-prompt-vi";
 import { getCustomer } from "@/lib/services/session-data-service";
 
@@ -81,9 +82,9 @@ export async function runOrderingAgentTurn(psid: string, userMessages: string[])
   ].slice(-12);
   await saveSession({ ...session, history: newHistory });
 
-  // Trace tên tools đã gọi theo thứ tự — hiện lên staff console để giám khảo THẤY agent hành động
+  // Trace tools + QUYẾT ĐỊNH (args/kết quả then chốt) — staff console dịch tiếng Việt khi hiển thị
   // (rubric AABW: "make your reasoning and multi-step actions visible").
-  const toolTrace = toolCalls.map((c) => c.toolName);
+  const toolTrace = buildToolTrace(toolCalls, toolResults);
 
   return { text, handedOff, carouselItemIds, toolTrace };
 }
