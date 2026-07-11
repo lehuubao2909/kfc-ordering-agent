@@ -15,21 +15,25 @@
 ## Order flow (state machine)
 
 ```
-KHÁM PHÁ → GIỎ HÀNG → XÁC NHẬN → GIAO HÀNG → THANH TOÁN → ĐÃ ĐẶT → CHUẨN BỊ → ĐANG GIAO → HOÀN TẤT
- menu card   thêm/bớt,   đọc lại đơn  địa chỉ+SĐT   COD: chốt      mã đơn     push        push + ETA   cảm ơn +
- tư vấn,     size/SL,    + tổng +     (loyalty tự   QR/thẻ: link   + ETA                               chúc ngon
- ưu đãi      upsell ×1   auto voucher  nhận diện)    /pay → paid                                        miệng
+KHÁM PHÁ → GIỎ HÀNG → XÁC NHẬN → GIAO HÀNG ──────────────→ THANH TOÁN → ĐÃ ĐẶT → CHUẨN BỊ → ĐANG GIAO → HOÀN TẤT
+ menu card   thêm/bớt,   đọc lại đơn  địa chỉ+SĐT → RESOLVE    COD: chốt     mã đơn +    push        push + ETA   cảm ơn +
+ tư vấn,     size/SL,    + tổng +     CỬA HÀNG: match quận →   QR/thẻ: link  cửa hàng                             chúc ngon
+ ưu đãi      upsell ×1   auto voucher  gần nhất còn mở → check  /pay → paid   phục vụ                              miệng
+                                       món trong giỏ; hết món
+                                       → quay XÁC NHẬN gợi ý thay
 ```
 
-Mọi lúc: hỏi trạng thái · sửa/huỷ đơn (trước CHUẨN BỊ) · câu ngoài phạm vi → handoff (agent mute, staff tiếp quản qua console, release trả lại bot).
+- **Store-aware (P4 = 250+ cửa hàng, không phải 1 shop):** đơn route về đúng cửa hàng theo địa chỉ — match quận/huyện từ text (KHÔNG geocoding API), check giờ mở/đóng, check tồn món per-store (sparse: chỉ lưu món HẾT). Đóng cửa → gợi ý cửa hàng mở gần đó; không match được quận → cửa hàng flagship mặc định.
+- **Khách quen:** có `customers.lastAddress` → chào kèm "giao về địa chỉ cũ như lần trước?" — 1 chạm, resolve cửa hàng ngay từ đầu.
+- Mọi lúc: hỏi trạng thái · sửa/huỷ đơn (trước CHUẨN BỊ) · câu ngoài phạm vi → handoff (agent mute, staff tiếp quản qua console, release trả lại bot).
 
 ## Definition of Done — kịch bản demo master
 
-1. **Đặt hàng (2'):** khách nhắn "đói quá, có gì ngon?" → tư vấn + carousel menu ảnh thật → thêm 2 món → upsell theo giờ (khách nhận) → xác nhận đơn itemized → địa chỉ + SĐT → "anh có 1.250 điểm..." → chọn QR → trang /pay → paid → push "đã nhận thanh toán, 30–40 phút".
+1. **Đặt hàng (2'):** khách nhắn "đói quá, có gì ngon?" → tư vấn + carousel menu ảnh thật → thêm 2 món → upsell theo giờ (khách nhận) → xác nhận đơn itemized → địa chỉ + SĐT → bot chốt **"Cửa hàng KFC Nguyễn Trãi (Q.5, mở đến 22:00) sẽ chuẩn bị đơn"** → "anh có 1.250 điểm..." → chọn QR → trang /pay → paid → push "đã nhận thanh toán, 30–40 phút".
 2. **Tracking + Handoff (60"):** "đơn tới đâu rồi?" → bot trả lời; staff console chuyển trạng thái → khách nhận push; khách hỏi câu lạ → handoff → staff gõ tay → release.
-3. **Admin (30"):** funnel started→cart→confirmed→paid, upsell acceptance, NLU eval 18/20, đơn live.
+3. **Admin (30"):** funnel started→cart→confirmed→paid, upsell acceptance, NLU eval 18/20, đơn live (kèm cột cửa hàng).
 
-Round 1 (3'): video nén 90". Round 2 (7'): live, giám khảo tự đặt trên điện thoại họ.
+Round 1 (3'): video nén 90". Round 2 (7'): live, giám khảo tự đặt trên điện thoại họ + **beat "món hết"**: giỏ có bánh trứng, địa chỉ Q.5 → "món này bên cửa hàng gần anh vừa hết, đổi kem tươi nhé?" — chứng minh tồn kho per-store.
 
 ## Phases
 
@@ -43,7 +47,8 @@ Round 1 (3'): video nén 90". Round 2 (7'): live, giám khảo tự đặt trên
 
 ## Mốc cứng & Gates
 
-- **Gate 2 (trưa 10/7 — SỐNG CÒN):** webhook Messenger echo OK trên production URL. Fail không cứu được → họp khẩn, Plan B quay về P2.
+- **Gate 2 (trưa 10/7 — SỐNG CÒN):** webhook Messenger echo OK trên production URL. Fail không cứu được → họp khẩn, Plan B quay về P2. ✅ PASSED
+- **Gate store-layer (18:00 11/7):** lớp cửa hàng (resolve + giờ mở + tồn món) là ADDITIVE — chưa xong 18:00 → flag off: `set_delivery_info` trả cửa hàng flagship mặc định, golden path không được phép phụ thuộc.
 - **Gate 3 (tối 10/7):** chọn `OPENAI_MODEL` qua 10 câu transcript. · **M1 (trưa 11/7):** đặt đơn end-to-end COD qua Messenger. · **M2 (15:00):** payment + tracking + push đủ. · **M3 (19:00):** staff console + admin đủ. · **Gate 4 (22:00 11/7): FEATURE FREEZE.** · **8:00–8:30 sáng 12/7: NỘP.**
 
 ## Phân công (CHỐT 10/7 — ownership theo thư mục, chỉ chủ sở hữu được sửa)

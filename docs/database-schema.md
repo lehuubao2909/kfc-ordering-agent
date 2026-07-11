@@ -70,6 +70,22 @@ UI tracking (/order) hiển thị timeline: PLACED → PREPARING → DELIVERING 
 ### promotions
 `id PK, title, description, discountType, discountValue, active` — agent giới thiệu khi khách hỏi ưu đãi.
 
+### stores — cửa hàng KFC (MỚI 11/7: store-aware ordering)
+| Cột | Kiểu | Ghi chú |
+|---|---|---|
+| id | text PK | `kfc-nguyen-trai-q5` |
+| name / address | text | hiển thị trên receipt + tracking |
+| district | text | "Quận 5" |
+| districtAliases | jsonb string[] | match từ text địa chỉ: "q5", "quận 5"... KHÔNG geocoding API |
+| openHour / closeHour | int | giờ địa phương; check lúc resolve |
+| active | bool | |
+| unavailableItemIds | jsonb string[] | SPARSE — chỉ lưu món HẾT tại cửa hàng này |
+| isFlagship | bool? | cửa hàng mặc định khi không match được quận |
+
+Resolve logic (store-service, Dev A): lowercase địa chỉ → tìm store có alias khớp → ưu tiên đang mở → không match/đóng hết → flagship + note. `sessions.storeId` + `orders.storeId` (text?, thêm cột) lưu kết quả.
+
+Fixture: `src/fixtures/stores-sample.json` (10 cửa hàng HCM; Nguyễn Trãi Q5 hết `banh-trung-tan` — beat demo món hết; Phan Xích Long đóng 21h — beat cửa hàng đóng).
+
 ### loyalty_accounts
 `phone PK, points` — tra điểm theo SĐT.
 
