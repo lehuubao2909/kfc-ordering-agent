@@ -1,10 +1,9 @@
 "use client";
 
 /**
- * Gate Basic-auth cho /admin & /staff.
- * DEMO MODE (yêu cầu BTC "gated link costs points"): tự đăng nhập bằng credentials demo
- * (NEXT_PUBLIC_DEMO_ADMIN_AUTH, mặc định "kfc:demo2026") → giám khảo vào thẳng không thấy form.
- * Credentials sai/đổi → hiện form đã điền sẵn. API server-side vẫn giữ Basic auth như cũ.
+ * Gate Basic-auth cho /admin & /staff — ĐƠN GIẢN HOÁ (12/7): form đăng nhập với credentials demo
+ * ĐIỀN SẴN (kfc/demo2026) — giám khảo chỉ bấm 1 nút. Không auto-login (bản cũ gây lỗi khó đoán
+ * khi env lệch). API server-side vẫn giữ Basic auth như cũ.
  */
 import { createContext, FormEvent, ReactNode, useContext, useEffect, useState } from "react";
 
@@ -27,23 +26,9 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
   const [checking, setChecking] = useState(false);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      setToken(stored);
-      setReady(true);
-      return;
-    }
-    // Auto-login bằng credentials demo — thành công thì vào thẳng, thất bại mới hiện form
-    const candidate = btoa(DEMO_AUTH);
-    fetch("/api/admin/orders", { headers: { Authorization: `Basic ${candidate}` } })
-      .then((res) => {
-        if (res.ok) {
-          sessionStorage.setItem(STORAGE_KEY, candidate);
-          setToken(candidate);
-        }
-      })
-      .catch(() => {})
-      .finally(() => setReady(true));
+    // Chỉ khôi phục phiên đã đăng nhập trong session này — còn lại hiện form (đã điền sẵn)
+    setToken(sessionStorage.getItem(STORAGE_KEY));
+    setReady(true);
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -63,7 +48,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
     setToken(candidate);
   }
 
-  if (!ready) return <div className="grid min-h-[60vh] place-items-center text-sm font-bold text-zinc-400">Đang vào trang quản trị…</div>;
+  if (!ready) return null;
 
   if (!token) {
     return (
@@ -71,6 +56,7 @@ export function AdminAuthGate({ children }: { children: ReactNode }) {
         <form onSubmit={handleSubmit} className="premium-card w-full max-w-sm rounded-2xl p-6">
           <p className="text-xs font-bold uppercase tracking-[0.16em] text-red-700">Khu vực vận hành</p>
           <h1 className="mt-2 text-xl font-black">Đăng nhập quản trị</h1>
+          <p className="mt-2 text-sm text-zinc-500">Tài khoản demo đã điền sẵn — bấm nút bên dưới để vào.</p>
           <label className="mt-5 block text-sm font-bold" htmlFor="username">Tài khoản
             <input id="username" name="username" required autoComplete="username" defaultValue={DEMO_AUTH.split(":")[0]} className="mt-2 w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm focus-visible:border-red-600 focus-visible:ring-2 focus-visible:ring-red-200" />
           </label>
