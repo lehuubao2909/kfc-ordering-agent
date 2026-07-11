@@ -38,9 +38,20 @@ export default async function LandingPage() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-sm rounded-[2rem] bg-white p-5 text-zinc-950 shadow-2xl shadow-black/40">
-            <div className="rounded-2xl border border-zinc-200 p-4"><Image src={qrDataUrl} width={360} height={360} priority alt="Mã QR mở trợ lý đặt món KFC trên Messenger" className="aspect-square size-full" unoptimized /></div>
-            <div className="flex items-center gap-3 px-2 pb-1 pt-4"><span className="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-600 text-xl text-white" aria-hidden="true">✦</span><div><p className="font-black">Quét mã đặt ngay</p><p className="text-sm text-zinc-500">Không cần cài app, đặt món siêu tốc</p></div></div>
+          <div className="mx-auto w-full max-w-sm">
+            <div className="relative rounded-[2rem] bg-white p-5 text-zinc-950 shadow-2xl shadow-black/40">
+              <div className="rounded-2xl border border-zinc-200 p-4"><Image src={qrDataUrl} width={360} height={360} priority alt="Mã QR mở trợ lý đặt món KFC trên Messenger" className="aspect-square size-full" unoptimized /></div>
+              <div className="flex items-center gap-3 px-2 pb-1 pt-4"><span className="grid size-11 shrink-0 place-items-center rounded-xl bg-blue-600 text-xl text-white" aria-hidden="true">✦</span><div><p className="font-black">Quét mã đặt ngay</p><p className="text-sm text-zinc-500">Không cần cài app, đặt món siêu tốc</p></div></div>
+            </div>
+            {/* Minh bạch giới hạn dev mode — app Meta chưa kịp qua App Review trong khuôn khổ hackathon */}
+            <div className="mt-4 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3.5">
+              <p className="text-[13px] font-black uppercase tracking-wide text-amber-300">⚠ Lưu ý trải nghiệm demo</p>
+              <p className="mt-1.5 text-[13.5px] leading-relaxed text-amber-100/90">
+                Ứng dụng Messenger đang ở <b>chế độ Development</b> (chưa kịp qua Meta App Review trong thời gian hackathon) — hiện chỉ tài khoản được cấp quyền Tester chat được với bot. Muốn trải nghiệm trực tiếp, liên hệ{" "}
+                <a href="mailto:baole@goku.agency" className="font-bold text-amber-300 underline underline-offset-2 hover:text-amber-200">baole@goku.agency</a>{" "}
+                hoặc team GOKU tại sự kiện — cấp quyền chỉ mất ~1 phút.
+              </p>
+            </div>
           </div>
         </div>
       </section>
