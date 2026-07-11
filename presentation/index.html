@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>KFC Ordering Agent Â· Presentation</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="presentation-app" id="app">
+      <div class="ambient ambient-one" aria-hidden="true"></div>
+      <div class="ambient ambient-two" aria-hidden="true"></div>
+
+      <header class="toolbar">
+        <div class="brand">
+          <img src="./assets/icons/goku-mark.svg" alt="" class="brand-mark" />
+          <div>
+            <p class="brand-kicker">Demo Day Presentation</p>
+            <h1>KFC Ordering Agent</h1>
+          </div>
+        </div>
+
+        <div class="toolbar-center">
+          <div class="slide-meta">
+            <span id="slideCounter">Slide 1 / 16</span>
+            <span class="dot">â€¢</span>
+            <span id="slideLabel">Cover</span>
+          </div>
+          <span id="exportStatus" class="slide-meta" aria-live="polite" hidden></span>
+        </div>
+
+        <div class="toolbar-actions">
+          <button class="ghost" id="prevBtn" type="button" aria-label="Previous slide">Previous</button>
+          <button class="ghost" id="nextBtn" type="button" aria-label="Next slide">Next</button>
+          <button class="primary" id="printBtn" type="button" aria-label="Export PDF">Export PDF</button>
+        </div>
+      </header>
+
+      <section class="viewport" aria-label="Presentation slides">
+        <div class="deck-shell" id="deckShell">
+          <div class="deck-track" id="deckTrack"></div>
+        </div>
+      </section>
+
+      <footer class="progress-shell" aria-label="Progress">
+        <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+      </footer>
+
+      <noscript>
+        <div class="noscript">Presentation nĂ y cáº§n JavaScript Ä‘á»ƒ Ä‘iá»u hÆ°á»›ng slide.</div>
+      </noscript>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/html-to-image/dist/html-to-image.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf/dist/jspdf.umd.min.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>
