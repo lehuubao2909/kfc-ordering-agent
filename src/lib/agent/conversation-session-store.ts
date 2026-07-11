@@ -1,9 +1,16 @@
 /**
  * Session store + per-conversation lock. OWNER: Dev B.
- * Lock chống 2 serverless instance xử lý cùng 1 khách: UPDATE sessions SET processing_until = now()+60s
- * WHERE psid=? AND (processing_until IS NULL OR processing_until < now()) — update được = giành lock.
+ * Phân vai với session-data-service (Dev A): file NÀY chỉ đụng history + lock (cột processing_until);
+ * cart/state/mode/activeOrderId do session-data-service ghi. Cùng bảng sessions, khác cột, không tranh chấp.
+ *
+ * Lock chống 2 serverless instance xử lý cùng 1 khách: UPDATE ... SET processing_until = now()+60s
+ * WHERE psid=? AND (processing_until IS NULL OR processing_until < now()) — update được (RETURNING có row) = giành lock.
  */
-import { Cart, OrderState, SessionMode } from "@/lib/types";
+import { and, eq, isNull, lt, or } from "drizzle-orm";
+import { db } from "@/lib/db/client";
+import { sessions } from "@/lib/db/schema";
+import { Cart, CartSchema, OrderState, SessionMode } from "@/lib/types";
+import { getOrCreateSession } from "@/lib/services/session-data-service";
 
 export type ConversationSession = {
   psid: string;
@@ -14,21 +21,48 @@ export type ConversationSession = {
   history: { role: string; content: string }[];
 };
 
-// TODO(Dev B): get-or-create session
-export async function getSession(_psid: string): Promise<ConversationSession> {
-  throw new Error("TODO(Dev B): getSession");
+const LOCK_MS = 60_000; // steal lock sau 60s (instance trước treo/chết)
+const HISTORY_LIMIT = 12; // token bounded — chỉ giữ 12 tin gần nhất
+
+/** Đọc session đầy đủ (tạo mới nếu chưa có, qua session-data-service của Dev A). */
+export async function getSession(psid: string): Promise<ConversationSession> {
+  const row = await getOrCreateSession(psid);
+  return {
+    psid: row.psid,
+    state: row.state as OrderState,
+    mode: row.mode as SessionMode,
+    cart: CartSchema.parse(row.cart ?? { items: [] }),
+    activeOrderId: row.activeOrderId ?? null,
+    history: (row.history as { role: string; content: string }[]) ?? [],
+  };
 }
 
-// TODO(Dev B): acquire lock kiểu compare-and-set như mô tả trên; true = được xử lý
-export async function tryAcquireProcessingLock(_psid: string): Promise<boolean> {
-  throw new Error("TODO(Dev B): tryAcquireProcessingLock");
+/** Compare-and-set: giành lock nếu chưa ai giữ hoặc lock cũ đã hết hạn. true = được xử lý. */
+export async function tryAcquireProcessingLock(psid: string): Promise<boolean> {
+  const now = new Date();
+  const until = new Date(now.getTime() + LOCK_MS);
+  const rows = await db
+    .update(sessions)
+    .set({ processingUntil: until })
+    .where(
+      and(
+        eq(sessions.psid, psid),
+        or(isNull(sessions.processingUntil), lt(sessions.processingUntil, now))
+      )
+    )
+    .returning({ psid: sessions.psid });
+  return rows.length > 0;
 }
 
-export async function releaseProcessingLock(_psid: string): Promise<void> {
-  throw new Error("TODO(Dev B): releaseProcessingLock");
+export async function releaseProcessingLock(psid: string): Promise<void> {
+  await db.update(sessions).set({ processingUntil: null }).where(eq(sessions.psid, psid));
 }
 
-// TODO(Dev B): update state/mode/cart/history (giữ 12 tin cuối)
-export async function saveSession(_session: ConversationSession): Promise<void> {
-  throw new Error("TODO(Dev B): saveSession");
+/** Chỉ ghi history (12 tin cuối) — cart/state/mode đã được tools ghi qua session-data-service. */
+export async function saveSession(session: ConversationSession): Promise<void> {
+  const history = session.history.slice(-HISTORY_LIMIT);
+  await db
+    .update(sessions)
+    .set({ history, updatedAt: new Date() })
+    .where(eq(sessions.psid, session.psid));
 }
