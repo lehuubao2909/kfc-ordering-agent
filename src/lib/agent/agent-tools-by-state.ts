@@ -15,25 +15,26 @@ import { getFullMenu, getMenuByCategory, searchMenuItems } from "@/lib/services/
 import { addToCart, removeFromCart, updateCartItemQuantity, getCart } from "@/lib/services/cart-service";
 import { getActivePromotions } from "@/lib/services/promotion-voucher-service";
 import { getUpsellSuggestions } from "@/lib/services/upsell-recommendation-service";
-import { createOrderFromSession, cancelOrder, getActiveOrderByPsid } from "@/lib/services/order-service";
+import { createOrderFromSession, cancelOrder, getActiveOrderByPsid, getLatestOrderByPsid } from "@/lib/services/order-service";
 import { applyDeliveryInfo, getStoreById, getUnavailableCartItems } from "@/lib/services/store-service";
 import { getPaymentLink } from "@/lib/services/payment-mock-service";
 import { getLoyaltyPoints } from "@/lib/services/loyalty-service";
 import { getCustomer, getOrCreateSession, setSessionState, setSessionMode } from "@/lib/services/session-data-service";
 
-/** Tool nào được phép ở state nào — mirror docs/api-contract.md mục State machine */
+/** Tool nào được phép ở state nào — mirror docs/api-contract.md mục State machine.
+ * get_order_status có ở MỌI state (fix 11/7: khách hỏi "đơn tới đâu" giữa bước thanh toán bị handoff oan). */
 export const TOOLS_BY_STATE: Record<OrderState, string[]> = {
   BROWSING: ["get_menu", "get_promotions", "add_to_cart", "get_order_status", "handoff_to_human"],
-  CART: ["get_menu", "get_promotions", "get_upsell_suggestions", "add_to_cart", "remove_from_cart", "update_cart_item", "view_cart", "confirm_order", "handoff_to_human"],
-  CONFIRMING: ["view_cart", "add_to_cart", "remove_from_cart", "get_upsell_suggestions", "set_delivery_info", "handoff_to_human"],
-  COLLECTING_DELIVERY: ["set_delivery_info", "get_loyalty_points", "handoff_to_human"],
-  SELECTING_PAYMENT: ["select_payment_method", "get_loyalty_points", "view_cart", "handoff_to_human"],
+  CART: ["get_menu", "get_promotions", "get_upsell_suggestions", "add_to_cart", "remove_from_cart", "update_cart_item", "view_cart", "confirm_order", "get_order_status", "handoff_to_human"],
+  CONFIRMING: ["view_cart", "add_to_cart", "remove_from_cart", "get_upsell_suggestions", "set_delivery_info", "get_order_status", "handoff_to_human"],
+  COLLECTING_DELIVERY: ["set_delivery_info", "get_loyalty_points", "get_order_status", "handoff_to_human"],
+  SELECTING_PAYMENT: ["select_payment_method", "get_loyalty_points", "view_cart", "get_order_status", "handoff_to_human"],
   AWAITING_PAYMENT: ["get_order_status", "cancel_order", "handoff_to_human"],
   PLACED: ["get_order_status", "cancel_order", "get_menu", "handoff_to_human"],
   PREPARING: ["get_order_status", "get_menu", "handoff_to_human"],
   DELIVERING: ["get_order_status", "get_menu", "handoff_to_human"],
-  DELIVERED: ["get_menu", "get_promotions", "add_to_cart", "handoff_to_human"],
-  CANCELLED: ["get_menu", "get_promotions", "add_to_cart", "handoff_to_human"],
+  DELIVERED: ["get_menu", "get_promotions", "add_to_cart", "get_order_status", "handoff_to_human"],
+  CANCELLED: ["get_menu", "get_promotions", "add_to_cart", "get_order_status", "handoff_to_human"],
 };
 
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : "Có lỗi xảy ra ạ.");
@@ -87,7 +88,8 @@ function buildAllTools(psid: string): ToolSet {
         try {
           await addToCart(psid, { itemId: r.item.id, quantity, ...(note ? { note } : {}) });
           const session = await getOrCreateSession(psid);
-          if (session.state === "BROWSING") await setSessionState(psid, "CART");
+          // DELIVERED/CANCELLED = đơn cũ đã xong → thêm món là bắt đầu đơn MỚI (fix 11/7)
+          if (["BROWSING", "DELIVERED", "CANCELLED"].includes(session.state)) await setSessionState(psid, "CART");
           const cart = await getCart(psid);
           return { ok: true, added: r.item.name, quantity, cartItemCount: cart.items.reduce((n, i) => n + i.quantity, 0) };
         } catch (e) {
@@ -179,9 +181,11 @@ function buildAllTools(psid: string): ToolSet {
           ok: true,
           store: { name: res.store.name, closeHour: res.store.closeHour },
           storeWasOpen: res.storeWasOpen,
-          note: res.storeWasOpen
-            ? `Báo khách: "${res.store.name}" (mở đến ${res.store.closeHour}h) sẽ chuẩn bị đơn. Rồi hỏi cách thanh toán (tiền mặt/QR/thẻ).`
-            : `Cửa hàng gần nhất đã đóng, đơn chuyển về "${res.store.name}". Báo khách nhẹ nhàng rồi hỏi cách thanh toán.`,
+          note:
+            (res.storeWasOpen
+              ? `Báo khách: "${res.store.name}" (mở đến ${res.store.closeHour}h) sẽ chuẩn bị đơn. Rồi hỏi cách thanh toán (tiền mặt/QR/thẻ).`
+              : `Cửa hàng gần nhất đã đóng, đơn chuyển về "${res.store.name}". Báo khách nhẹ nhàng rồi hỏi cách thanh toán.`) +
+            " QUAN TRỌNG: nếu khách ĐÃ nói cách thanh toán từ trước (vd 'tiền mặt') thì GỌI select_payment_method NGAY, đừng hỏi lại và đừng tự nói 'em đặt hàng' suông.",
         };
       },
     }),
@@ -231,12 +235,19 @@ function buildAllTools(psid: string): ToolSet {
     }),
 
     get_order_status: tool({
-      description: "Xem trạng thái đơn đang xử lý của khách.",
+      description: "Xem trạng thái đơn của khách (đơn đang xử lý, hoặc đơn gần nhất nếu đã giao/hủy).",
       inputSchema: z.object({}),
       execute: async () => {
         const o = await getActiveOrderByPsid(psid);
-        if (!o) return { note: "Khách chưa có đơn nào đang xử lý." };
-        return { orderId: o.id, status: o.status, total: fmtVnd(o.totalVnd), trackingUrl: `${APP_URL}/order/${o.id}` };
+        if (o) return { orderId: o.id, status: o.status, total: fmtVnd(o.totalVnd), trackingUrl: `${APP_URL}/order/${o.id}` };
+        // Không có đơn active → trả đơn GẦN NHẤT cho câu trả lời tử tế (fix 11/7: đơn vừa giao xong mà bot nói "chưa có đơn")
+        const last = await getLatestOrderByPsid(psid);
+        if (!last) return { note: "Khách chưa đặt đơn nào. Mời khách xem menu đặt món." };
+        if (last.status === "DELIVERED")
+          return { orderId: last.id, status: last.status, note: `Đơn ${last.id} ĐÃ GIAO THÀNH CÔNG. Xác nhận với khách + mời đặt đơn mới nếu muốn.` };
+        if (last.status === "CANCELLED")
+          return { orderId: last.id, status: last.status, note: `Đơn ${last.id} đã hủy trước đó. Mời khách đặt đơn mới.` };
+        return { orderId: last.id, status: last.status, total: fmtVnd(last.totalVnd), trackingUrl: `${APP_URL}/order/${last.id}` };
       },
     }),
 

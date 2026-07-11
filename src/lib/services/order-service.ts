@@ -5,13 +5,13 @@
  */
 import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { orders } from "@/lib/db/schema";
+import { orders, sessions } from "@/lib/db/schema";
 import { Cart, Order, OrderSchema, OrderState, PaymentMethod } from "@/lib/types";
 import { getMenuItemById } from "./menu-service";
 import { autoApplyBestVoucher } from "./promotion-voucher-service";
 import { earnPointsForOrder } from "./loyalty-service";
 import { emitOrderStatusChange } from "./order-status-events";
-import { getCustomer, getOrCreateSession, setSessionActiveOrder, setSessionState } from "./session-data-service";
+import { getCustomer, getOrCreateSession, saveSessionCart, setSessionActiveOrder, setSessionState } from "./session-data-service";
 
 export class OrderTransitionError extends Error {
   constructor(message: string) {
@@ -140,6 +140,9 @@ export async function createOrderFromSession(psid: string, paymentMethod: Paymen
 
   await setSessionActiveOrder(psid, row.id);
   await setSessionState(psid, status);
+  // Giỏ đã snapshot vào orders.items — CLEAR để khách đặt đơn mới không bị dính giỏ cũ
+  // (bug 11/7: sau khi giao xong, khách đặt tiếp bị bot từ chối vì cart + state kẹt đơn cũ).
+  await saveSessionCart(psid, { items: [] });
 
   const order = rowToOrder(row);
   await emitOrderStatusChange(order); // COD → push xác nhận ngay; AWAITING_PAYMENT → notification bỏ qua
@@ -164,6 +167,13 @@ export async function advanceOrderStatus(orderId: string, to: OrderState): Promi
     .returning();
   if (!row) throw new OrderTransitionError(`Trạng thái đơn ${orderId} vừa thay đổi, anh/chị thử lại giúp em nhé.`);
   const order = rowToOrder(row);
+
+  // Sync session theo tiến độ đơn (nếu session đang gắn đơn này) — thiếu bước này bot bị kẹt
+  // ở AWAITING_PAYMENT/PLACED cũ, mở sai bộ tools (bug 11/7: "đơn tới đâu rồi" bị handoff oan).
+  await db
+    .update(sessions)
+    .set({ state: to, updatedAt: new Date() })
+    .where(and(eq(sessions.psid, row.psid), eq(sessions.activeOrderId, orderId)));
 
   if (to === "DELIVERED" && order.deliveryPhone) {
     try {
@@ -196,4 +206,10 @@ export async function getActiveOrderByPsid(psid: string): Promise<Order | null> 
   const rows = await db.select().from(orders).where(eq(orders.psid, psid)).orderBy(desc(orders.createdAt));
   const active = rows.find((r) => r.status !== "DELIVERED" && r.status !== "CANCELLED");
   return active ? rowToOrder(active) : null;
+}
+
+/** Đơn mới nhất bất kể trạng thái — cho get_order_status trả lời tử tế khi đơn đã giao/hủy. */
+export async function getLatestOrderByPsid(psid: string): Promise<Order | null> {
+  const rows = await db.select().from(orders).where(eq(orders.psid, psid)).orderBy(desc(orders.createdAt)).limit(1);
+  return rows[0] ? rowToOrder(rows[0]) : null;
 }
