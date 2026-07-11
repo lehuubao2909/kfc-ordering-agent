@@ -1,0 +1,11 @@
+import type { MockOrder } from "@/lib/mock/mock-data-types";
+import type { OrderState } from "@/lib/types";
+import { StatusBadge } from "@/components/shared/status-badge";
+import { currencyFormatter } from "@/components/shared/formatters";
+
+const nextStatus: Partial<Record<OrderState, OrderState>> = { PLACED: "PREPARING", PREPARING: "DELIVERING", DELIVERING: "DELIVERED" };
+const nextLabel: Partial<Record<OrderState, string>> = { PLACED: "Bắt đầu chế biến", PREPARING: "Bàn giao shipper", DELIVERING: "Xác nhận đã giao" };
+
+export function OrderStatusAdvancePanel({ orders, onAdvance }: { orders: MockOrder[]; onAdvance: (id: string, status: OrderState) => void }) {
+  return <section className="rounded-2xl border border-zinc-200 bg-white shadow-sm" aria-labelledby="live-orders-title"><div className="flex items-center justify-between border-b border-zinc-100 px-5 py-4"><div><h2 id="live-orders-title" className="font-black">Danh sách đơn đang xử lý</h2><p className="text-xs text-zinc-400">Hệ thống OMS mô phỏng</p></div><span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">{orders.filter((order) => order.status !== "DELIVERED").length} đang chạy</span></div><div className="divide-y divide-zinc-100">{orders.filter((order) => ["PLACED", "PREPARING", "DELIVERING"].includes(order.status)).map((order) => { const next = nextStatus[order.status]; return <article key={order.id} className="grid gap-3 p-4 sm:grid-cols-[1fr_auto] sm:items-center"><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="font-mono text-sm font-black" translate="no">{order.id}</span><StatusBadge status={order.status} /></div><p className="mt-1 truncate text-xs text-zinc-500">{order.deliveryAddress}</p><p className="mt-1 text-sm font-black tabular-nums">{currencyFormatter.format(order.totalVnd)}</p></div>{next ? <button type="button" onClick={() => onAdvance(order.id, next)} className="rounded-lg border border-zinc-300 px-3 py-2 text-xs font-black transition-colors duration-200 hover:border-red-600 hover:bg-red-50 hover:text-red-700 focus-visible:ring-2 focus-visible:ring-red-600">{nextLabel[order.status]} →</button> : null}</article>; })}</div></section>;
+}

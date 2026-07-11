@@ -1,26 +1,110 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f7f5;
+  --foreground: #18181b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: rgb(185 28 28 / 0.16);
+}
+
+::selection { background: #fecaca; color: #7f1d1d; }
+
+.premium-canvas {
+  background:
+    radial-gradient(circle at 8% 2%, rgb(220 38 38 / .075), transparent 24rem),
+    radial-gradient(circle at 92% 16%, rgb(245 158 11 / .06), transparent 22rem),
+    #f5f5f3;
+}
+
+.premium-card {
+  border: 1px solid rgb(228 228 231 / .9);
+  background: rgb(255 255 255 / .88);
+  box-shadow: 0 1px 2px rgb(24 24 27 / .03), 0 12px 40px rgb(24 24 27 / .045);
+  backdrop-filter: blur(14px);
+}
+
+.pressable {
+  transform: translateZ(0);
+  transition-property: transform, box-shadow, background-color, border-color, color, opacity;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(.2, .8, .2, 1);
+}
+.pressable:hover { transform: translateY(-1px); }
+.pressable:active { transform: translateY(0) scale(.975); }
+
+.ambient-orb { animation: ambient-float 9s ease-in-out infinite alternate; }
+@keyframes ambient-float { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(-18px, 24px, 0) scale(1.08); } }
+
+.chat-scrollbar { scrollbar-width: thin; scrollbar-color: #a1a1aa transparent; }
+.chat-scrollbar::-webkit-scrollbar { width: 5px; }
+.chat-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.chat-scrollbar::-webkit-scrollbar-thumb { background: #a1a1aa; border-radius: 999px; }
+
+#conversations-panel,
+#conversations-panel > div,
+#conversations-panel > div > div,
+#conversations-panel aside {
+  min-width: 0;
+  max-width: 100%;
+}
+#conversations-panel aside { overflow: hidden; }
+#conversations-panel aside > div:last-child,
+#conversations-panel .chat-scrollbar {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+[role="tablist"]:has(#conversations-tab) {
+  width: 100%;
+  max-width: 22rem;
+  margin-right: auto;
+  margin-bottom: .75rem;
+  padding: .25rem;
+  border-radius: .75rem;
+}
+#conversations-tab,
+#orders-tab {
+  border-radius: .625rem;
+  padding: .5rem .75rem;
+  font-size: .75rem;
+  line-height: 1.25rem;
+}
+
+button, a, input, textarea, select { touch-action: manipulation; }
+button:not(:disabled), a { cursor: pointer; }
+button, a {
+  transition-property: transform, box-shadow, background-color, border-color, color, opacity;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(.2, .8, .2, 1);
+}
+button:not(:disabled):active, a:active { transform: scale(.975); }
+
+.skip-link {
+  position: fixed; top: .75rem; left: .75rem; z-index: 100;
+  transform: translateY(-200%); border-radius: .5rem; background: white;
+  padding: .65rem 1rem; color: #b91c1c; font-weight: 700;
+  box-shadow: 0 8px 28px rgb(0 0 0 / .18);
+}
+.skip-link:focus-visible { transform: translateY(0); outline: 3px solid #ef4444; }
+.dot-grid { background-image: radial-gradient(rgb(255 255 255 / .15) 1px, transparent 1px); background-size: 20px 20px; }
+.soft-grid { background-image: linear-gradient(to right, rgb(24 24 27 / .035) 1px, transparent 1px), linear-gradient(to bottom, rgb(24 24 27 / .035) 1px, transparent 1px); background-size: 32px 32px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important; animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important; transition-duration: .01ms !important;
+  }
 }

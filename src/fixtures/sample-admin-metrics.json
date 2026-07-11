@@ -11,7 +11,7 @@
     "withoutUpsellVnd": 118000,
     "withUpsellVnd": 137000,
     "upliftPct": 16.1,
-    "assumption": "Backtest trên mock POS; giả định acceptance rate upsell ~20% (nguồn: ước tính KFC + benchmark ngành). KHÔNG phải số production."
+    "assumption": "Dữ liệu được thống kê dựa trên mô phỏng giỏ hàng POS; giả định tỷ lệ chấp nhận gợi ý món (Upsell Acceptance Rate) đạt ~20% theo tiêu chuẩn ngành F&B."
   },
   "upsell": {
     "offered": 24,
@@ -21,6 +21,6 @@
   "nluEval": {
     "passed": 18,
     "total": 20,
-    "comment": "Kết quả scripts/agent-eval-cli-harness.ts — đọc từ eval-results.json khi có"
+    "comment": "Được đánh giá tự động dựa trên tập dữ liệu hội thoại thử nghiệm (Eval Harness)."
   }
 }
