@@ -26,9 +26,11 @@ import { getCustomer, getOrCreateSession, setSessionState, setSessionMode } from
 export const TOOLS_BY_STATE: Record<OrderState, string[]> = {
   BROWSING: ["get_menu", "get_promotions", "add_to_cart", "get_order_status", "handoff_to_human"],
   CART: ["get_menu", "get_promotions", "get_upsell_suggestions", "add_to_cart", "remove_from_cart", "update_cart_item", "view_cart", "confirm_order", "get_order_status", "handoff_to_human"],
-  CONFIRMING: ["view_cart", "add_to_cart", "remove_from_cart", "get_upsell_suggestions", "set_delivery_info", "get_order_status", "handoff_to_human"],
-  COLLECTING_DELIVERY: ["set_delivery_info", "get_loyalty_points", "get_order_status", "handoff_to_human"],
-  SELECTING_PAYMENT: ["select_payment_method", "get_loyalty_points", "view_cart", "get_order_status", "handoff_to_human"],
+  // get_menu có ở MỌI bước còn sửa được giỏ (fix 11/7 đêm: khách đang CONFIRMING xin xem menu
+  // → agent không có tool, vớ upsell rồi hứa suông "chờ em gửi hình").
+  CONFIRMING: ["get_menu", "get_promotions", "view_cart", "add_to_cart", "remove_from_cart", "get_upsell_suggestions", "set_delivery_info", "get_order_status", "handoff_to_human"],
+  COLLECTING_DELIVERY: ["get_menu", "set_delivery_info", "get_loyalty_points", "get_order_status", "handoff_to_human"],
+  SELECTING_PAYMENT: ["get_menu", "get_promotions", "select_payment_method", "get_loyalty_points", "view_cart", "get_order_status", "handoff_to_human"],
   AWAITING_PAYMENT: ["get_order_status", "cancel_order", "get_menu", "get_promotions", "handoff_to_human"],
   PLACED: ["get_order_status", "cancel_order", "get_menu", "handoff_to_human"],
   PREPARING: ["get_order_status", "get_menu", "handoff_to_human"],

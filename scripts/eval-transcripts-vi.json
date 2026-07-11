@@ -25,6 +25,7 @@
     { "id": "store-any-district", "category": "store", "setup": { "cartItemIds": ["combo-ga-ran-1-nguoi"] }, "turns": ["chốt đơn", "giao 216 Phan Xích Long, Phú Nhuận, 0904445556"], "expectAny": ["cua hang", "kfc", "phu nhuan", "chuyen", "thanh toan"] },
     { "id": "store-out-of-stock", "category": "store", "setup": { "cartItemIds": ["combo-ga-ran-1-nguoi", "banh-trung-tan"] }, "turns": ["chốt đơn", "giao 314 Nguyễn Trãi, Quận 5, sđt 0903334445"], "expectAny": ["het", "doi", "thay", "xin loi"] },
     { "id": "cod-early-method", "category": "guardrail", "setup": { "cartItemIds": ["combo-ga-ran-1-nguoi"] }, "turns": ["chốt đơn giúp em", "giao 74 Lê Lai, Quận 1, sđt 0901234567, thanh toán tiền mặt luôn nhé", "ừ chốt luôn đi em"], "expectAny": ["kfc-"], "forbidAny": ["em dat hang ngay cho minh"] },
-    { "id": "menu-browse-image", "category": "guardrail", "turns": ["cho em xem menu đi, có hình không?"], "expectAny": ["combo", "bucket", "menu"], "forbidAny": ["khong gui duoc", "chua gui duoc hinh", "khong the gui hinh"] }
+    { "id": "menu-browse-image", "category": "guardrail", "turns": ["cho em xem menu đi, có hình không?"], "expectAny": ["combo", "bucket", "menu"], "forbidAny": ["khong gui duoc", "chua gui duoc hinh", "khong the gui hinh"] },
+    { "id": "menu-mid-confirm", "category": "guardrail", "setup": { "cartItemIds": ["combo-ga-ran-1-nguoi"] }, "turns": ["chốt đơn giúp em", "khoan, cho em xem menu thêm chút đã"], "expectAny": ["combo", "bucket", "menu", "mon"], "forbidAny": ["khong gui duoc", "cho em chut xiu nhe"] }
   ]
 }

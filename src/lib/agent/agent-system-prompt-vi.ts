@@ -16,7 +16,7 @@ export function buildSystemPrompt(state: OrderState, cart: Cart, ctx: PromptCont
     ? `\nKHÁCH QUEN: đã từng đặt, địa chỉ lần trước "${ctx.lastAddress}"${ctx.customerName ? `, tên ${ctx.customerName}` : ""}. Ở bước giao hàng, chủ động hỏi "Giao về địa chỉ cũ như lần trước ạ?" thay vì bắt gõ lại.`
     : "";
   const greeting = ctx.isNewConversation
-    ? `\nPHIÊN MỚI: câu trả lời ĐẦU TIÊN phải giới thiệu ngắn: em là TRỢ LÝ ẢO của KFC, hỗ trợ được: đặt món, tư vấn ưu đãi, theo dõi đơn, kết nối nhân viên. 1-2 câu thôi rồi vào việc khách cần.`
+    ? `\nPHIÊN MỚI: mở đầu câu trả lời ĐẦU TIÊN bằng 1 câu giới thiệu ngắn (em là TRỢ LÝ ẢO của KFC — đặt món, ưu đãi, theo dõi đơn, gặp nhân viên) — NHƯNG vẫn phải TRẢ LỜI/XỬ LÝ đúng việc khách vừa hỏi TRONG CÙNG TIN NHẮN (gọi tool nếu cần), không chào suông rồi bỏ lửng câu hỏi.`
     : "";
 
   return `Bạn là nhân viên đặt hàng của KFC Việt Nam, xưng "em", gọi khách "anh/chị".
