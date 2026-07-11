@@ -1,6 +1,6 @@
 {
-  "passed": 0,
-  "total": 0,
-  "comment": "Chưa chạy eval — Dev B chạy `npm run eval` để cập nhật file này.",
-  "generatedAt": null
+  "passed": 23,
+  "total": 23,
+  "comment": "NLU eval 23/23 (100%) · model gpt-4.1 · 276.9s",
+  "generatedAt": "2026-07-11T06:59:48.788Z"
 }

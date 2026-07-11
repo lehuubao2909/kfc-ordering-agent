@@ -1,8 +1,9 @@
 /**
  * Messenger Send API adapter. OWNER: Dev B (Lead own env/Meta config).
  * sendTextMessage đã HOẠT ĐỘNG — webhook echo dùng ngay.
- * TODO(Dev B): carousel, quick replies, receipt — theo docs/api-contract.md mục Channel.
+ * carousel (generic template), quick replies (theo state), typing indicator, message tag push.
  */
+import { getMenuItemById } from "@/lib/services/menu-service";
 
 const GRAPH_URL = "https://graph.facebook.com/v23.0/me/messages";
 
@@ -43,12 +44,29 @@ export async function sendOrderUpdateMessage(recipientPsid: string, text: string
   });
 }
 
-// TODO(Dev B): carousel menu — generic template ≤10 cards (ảnh, giá, nút postback "Thêm món này")
-export async function sendMenuCarousel(_recipientPsid: string, _itemIds: string[]): Promise<void> {
-  throw new Error("TODO(Dev B): sendMenuCarousel");
+/** Carousel menu — generic template ≤10 cards (ảnh, giá, nút postback "Thêm món này"). */
+export async function sendMenuCarousel(recipientPsid: string, itemIds: string[]): Promise<void> {
+  const resolved = await Promise.all(itemIds.slice(0, 10).map((id) => getMenuItemById(id)));
+  const items = resolved.filter((m): m is NonNullable<typeof m> => m !== null);
+  if (!items.length) return;
+  const elements = items.map((m) => ({
+    title: `${m.name} — ${m.priceVnd.toLocaleString("vi-VN")}đ`,
+    ...(m.description ? { subtitle: m.description } : {}),
+    ...(m.imageUrl ? { image_url: m.imageUrl } : {}),
+    buttons: [{ type: "postback", title: "Thêm món này", payload: `ADD_ITEM:${m.id}` }],
+  }));
+  await callSendApi({
+    recipient: { id: recipientPsid },
+    message: { attachment: { type: "template", payload: { template_type: "generic", elements } } },
+    messaging_type: "RESPONSE",
+  });
 }
 
-// TODO(Dev B): quick replies theo state (Xem menu · Ưu đãi · Giỏ hàng · Trạng thái đơn · Gặp nhân viên)
-export async function sendQuickReplies(_recipientPsid: string, _text: string, _replies: { title: string; payload: string }[]): Promise<void> {
-  throw new Error("TODO(Dev B): sendQuickReplies");
+/** Quick replies theo state — Messenger giới hạn 13 nút. */
+export async function sendQuickReplies(recipientPsid: string, text: string, replies: { title: string; payload: string }[]): Promise<void> {
+  await callSendApi({
+    recipient: { id: recipientPsid },
+    message: { text, quick_replies: replies.slice(0, 13).map((r) => ({ content_type: "text", title: r.title, payload: r.payload })) },
+    messaging_type: "RESPONSE",
+  });
 }
