@@ -1,31 +1,34 @@
-/** Appendix A5–A8 + 2 slide Q&A prep (công thức trả lời + 6 câu 1-dòng theo rubric). */
+/**
+ * Appendix A5–A8 + 2 slide Q&A prep (chỉ có trong bản PDF NỘI BỘ, không nằm trong bản nộp).
+ * Nội dung tiếng Anh theo bản thành viên (12/7) — sửa số cũ: eval 24/24 → 26/26, Guardrail 4 → 6 case.
+ */
 import { Slide, Eyebrow, Title, Card, CardLabel, Callout } from "./slide-frame";
 
 export const appendixSlidesB = [
   // ── A5. ROI ───────────────────────────────────────────────────
   <Slide key="a5" footer="A5 · Impact / ROI">
-    <Eyebrow>A5 — ROI calculation · assumptions dán nhãn rõ</Eyebrow>
-    <Title>Công thức trước, con số sau</Title>
+    <Eyebrow>A5 — Impact / ROI · assumptions labeled</Eyebrow>
+    <Title>Formula first, numbers second</Title>
     <div className="mt-6 rounded-2xl bg-[#101828] p-6 text-center">
-      <p className="font-mono text-[22px] font-black text-white">Giá trị/năm = Đơn kênh chat/tháng × AOV × uplift × 12 <span className="text-[#F2A33C]">+</span> chuyển đổi thu hồi từ chat <span className="text-[#F2A33C]">+</span> giờ công đội trực page</p>
+      <p className="font-mono text-[22px] font-black text-white">Value / year = chat orders per month × AOV × uplift × 12 <span className="text-[#F2A33C]">+</span> recovered chat conversion <span className="text-[#F2A33C]">+</span> page-operator hours</p>
     </div>
     <div className="mt-5 grid grid-cols-3 gap-4">
-      <Card><CardLabel>Đã đo (mock, minh bạch)</CardLabel><p className="mt-2 text-[14.5px] leading-relaxed">Backtest 4.964 giao dịch POS: AOV +2.7% với acceptance 20% · upsell ngưỡng voucher tăng giá trị giỏ ngay trong demo.</p></Card>
-      <Card><CardLabel>Từ đề bài KFC</CardLabel><p className="mt-2 text-[14.5px] leading-relaxed">KFC ước tính upsell đúng ngữ cảnh tăng AOV 10–15% · kênh chat hiện chuyển đổi ≈ 0 vì 100% xử lý tay.</p></Card>
-      <Card><CardLabel>Pilot đo thật</CardLabel><p className="mt-2 text-[14.5px] leading-relaxed">A/B trên fanpage thật: completion rate, AOV delta, thời gian phản hồi, CSAT — 2 tuần có số thật thay mọi giả định.</p></Card>
+      <Card><CardLabel>Measured (mock, transparent)</CardLabel><p className="mt-2 text-[14.5px] leading-relaxed">Backtest of 4,964 POS transactions: AOV +2.7% at 20% acceptance · voucher-threshold upsell lifts basket value right in the demo.</p></Card>
+      <Card><CardLabel>From the KFC brief</CardLabel><p className="mt-2 text-[14.5px] leading-relaxed">KFC estimates context-right upsell lifts AOV 10–15% · the chat channel currently converts ≈ 0 because 100% is hand-handled.</p></Card>
+      <Card><CardLabel>Pilot measures for real</CardLabel><p className="mt-2 text-[14.5px] leading-relaxed">A/B on the real fanpage: completion rate, AOV delta, response time, CSAT — 2 weeks of real numbers replace every assumption.</p></Card>
     </div>
-    <div className="mt-5"><Callout>Chi phí LLM &lt;2% giá trị đơn — và chỉ kênh chat dùng LLM, upsell engine chạy deterministic miễn phí.</Callout></div>
+    <div className="mt-5"><Callout>LLM cost is under 2% of order value — and only the chat channel uses the LLM; the upsell engine runs deterministically, for free.</Callout></div>
   </Slide>,
 
   // ── A6. Alternatives ──────────────────────────────────────────
   <Slide key="a6" footer="A6 · Alternatives">
-    <Eyebrow>A6 — Alternatives · vì sao cách này</Eyebrow>
-    <Title>So với hai lối đi quen thuộc</Title>
+    <Eyebrow>A6 — Alternatives · why this path</Eyebrow>
+    <Title>Compared with two familiar paths</Title>
     <div className="mt-6 grid flex-1 grid-cols-3 gap-4">
       {[
-        ["Rule-based bot (menu nút bấm)", "Không hiểu “cho anh 2 gà cay ít cay giao Q5 trả tiền mặt” trong 1 câu · mỗi thay đổi flow = code lại cây nút", "❌ Cứng, không tự nhiên"],
-        ["General LLM assistant", "Trả lời hay nhưng không được phép cầm tiền: không state machine, không tool gating → bịa giá, đặt nhầm là chuyện chắc chắn xảy ra", "❌ Không kiểm soát"],
-        ["Hybrid của chúng tôi", "LLM lo ngôn ngữ tự nhiên · state machine + 14 tools khoá theo bước lo tiền và đơn · handoff lo ngoại lệ", "✅ Tự nhiên + an toàn"],
+        ["Rule-based bot (button menus)", "Can't parse “2 spicy chickens, mild, deliver D5, pay cash” in one sentence · every flow change means recoding the button tree", "❌ Rigid, unnatural"],
+        ["General LLM assistant", "Answers well but isn't allowed to handle money: no state machine, no tool gating → made-up prices and mis-orders are a certainty", "❌ Uncontrolled"],
+        ["Our hybrid", "The LLM handles natural language · a state machine + 14 step-locked tools handle money and orders · handoff handles exceptions", "✅ Natural + safe"],
       ].map(([t, d, verdict], i) => (
         <Card key={t} className={i === 2 ? "border-2 !border-[#C8102E]" : ""}>
           <p className="text-[17px] font-black leading-tight">{t}</p>
@@ -34,25 +37,25 @@ export const appendixSlidesB = [
         </Card>
       ))}
     </div>
-    <p className="mt-4 text-center text-[14.5px] font-bold text-[#1A2233]/55">“GenAI ở chỗ cần ngôn ngữ — deterministic ở chỗ đụng đến tiền.”</p>
+    <p className="mt-4 text-center text-[14.5px] font-bold text-[#1A2233]/55">“GenAI where language is needed — deterministic where money is touched.”</p>
   </Slide>,
 
   // ── A7. Evaluation results ────────────────────────────────────
   <Slide key="a7" footer="A7 · Evaluation Results">
     <Eyebrow>A7 — Evaluation results</Eyebrow>
-    <Title>Eval tự động — không tin cảm giác</Title>
+    <Title>Automated eval — we don't trust vibes</Title>
     <div className="mt-7 grid grid-cols-[0.9fr_1.1fr] gap-5">
       <Card className="flex flex-col items-center justify-center text-center">
         <p className="text-[72px] font-black leading-none text-[#C8102E]">26/26</p>
-        <p className="mt-2 text-[16px] font-bold">NLU eval tiếng Việt · gpt-5.4</p>
-        <p className="mt-1 text-[13.5px] text-[#1A2233]/60">Chạy tự động qua agent thật + services thật + DB thật</p>
+        <p className="mt-2 text-[16px] font-bold">Vietnamese NLU eval · gpt-5.4</p>
+        <p className="mt-1 text-[13.5px] text-[#1A2233]/60">Run through the real agent + real services + real DB</p>
       </Card>
       <div className="grid grid-rows-4 gap-2.5">
         {[
-          ["NLU (9 case)", "gọi món tự nhiên, số lượng, size mơ hồ → hỏi lại, gộp nhiều ý 1 câu"],
-          ["Flow (8 case)", "confirm → giao hàng → COD/QR → tracking → huỷ đúng luật"],
-          ["Guardrail (6 case)", "món không tồn tại → không bịa · nói COD sớm → vẫn tạo đơn thật"],
-          ["Store-aware (3 case)", "resolve đúng quận · cửa hàng đóng → chuyển · món hết → gợi ý thay"],
+          ["NLU (9 cases)", "natural item ordering, quantity, ambiguous size → re-ask, multiple intents in one sentence"],
+          ["Flow (8 cases)", "confirm → delivery → COD / QR → tracking → cancel, all by the rules"],
+          ["Guardrail (6 cases)", "nonexistent item → no fabrication · early COD mention → still creates a real order"],
+          ["Store-aware (3 cases)", "resolve the right district · store closed → switch · sold out → suggest an alternative"],
         ].map(([k, v]) => (
           <div key={k} className="flex items-center gap-3 rounded-xl border border-[#1A2233]/10 bg-white px-4 py-2">
             <span className="w-[150px] shrink-0 text-[13px] font-black text-[#2563EB]">{k}</span>
@@ -61,44 +64,44 @@ export const appendixSlidesB = [
         ))}
       </div>
     </div>
-    <div className="mt-5"><Callout>Eval là phanh hồi quy: hôm nay từng tụt 21/24 sau 1 thay đổi — bắt được và sửa TRƯỚC khi deploy.</Callout></div>
+    <div className="mt-5"><Callout>The eval is a regression brake: it once dropped to 21/24 after a change — caught and fixed BEFORE deploy.</Callout></div>
   </Slide>,
 
   // ── A8. Roadmap + limitations ─────────────────────────────────
   <Slide key="a8" footer="A8 · Roadmap + Limitations">
-    <Eyebrow>A8 — Roadmap + limitations · nói thật</Eyebrow>
-    <Title>Biết rõ mình đang ở đâu</Title>
+    <Eyebrow>A8 — Roadmap + limitations · honest</Eyebrow>
+    <Title>Knowing exactly where we stand</Title>
     <div className="mt-6 grid flex-1 grid-cols-2 gap-5">
       <Card>
-        <CardLabel>Giới hạn hiện tại (demo)</CardLabel>
+        <CardLabel>Current limits (demo)</CardLabel>
         <ul className="mt-3 space-y-2.5 text-[14.5px] font-semibold leading-snug text-[#1A2233]/80">
-          <li>• Data synthetic (BTC xác nhận hướng đúng khi chưa có data thật)</li>
-          <li>• Thanh toán mock minh bạch — chưa nối cổng thật</li>
-          <li>• Cửa hàng match theo quận, chưa check bán kính giao</li>
-          <li>• Messenger dev mode — người dùng cần role tester</li>
+          <li>• Synthetic data — the brief confirmed the direction is right absent real data</li>
+          <li>• Transparent mock payments — no real gateway connected yet</li>
+          <li>• Stores matched by district, no delivery-radius check yet</li>
+          <li>• Messenger dev mode — users need a tester role</li>
         </ul>
       </Card>
       <Card>
-        <CardLabel color="text-emerald-700">Roadmap sau pilot</CardLabel>
+        <CardLabel color="text-emerald-700">Roadmap after pilot</CardLabel>
         <ul className="mt-3 space-y-2.5 text-[14.5px] font-semibold leading-snug text-[#1A2233]/80">
-          <li>• Nối POS/OMS + loyalty thật của KFC (schema đã mirror sẵn)</li>
-          <li>• VNPay/MoMo webhook · distance API · menu overlay per-store</li>
-          <li>• Zalo cùng agent core (chỉ thêm adapter) · kiosk P2 cùng engine upsell</li>
-          <li>• Recurring Notifications opt-in · chống bom hàng (COD limit, blacklist)</li>
+          <li>• Connect KFC's real POS / OMS + loyalty (schema already mirrored)</li>
+          <li>• VNPay / MoMo webhook · distance API · per-store menu overlay</li>
+          <li>• Zalo on the same agent core (just add an adapter) · P2 kiosk on the same upsell engine</li>
+          <li>• Recurring Notifications opt-in · anti-fraud (COD limit, blacklist)</li>
         </ul>
       </Card>
     </div>
   </Slide>,
 
   // ── Q&A prep 1: công thức ─────────────────────────────────────
-  <Slide key="qa1" footer="Q&A Prep · nội bộ" dark>
-    <Eyebrow dark>Q&A · công thức 15–25 giây mỗi câu</Eyebrow>
-    <Title>Answer → Support → Connect</Title>
+  <Slide key="qa1" footer="Q&A Prep · internal" dark>
+    <Eyebrow dark>Q&A · 15–25 seconds per answer</Eyebrow>
+    <Title>Q&A — Answer → Support → Connect</Title>
     <div className="mt-8 grid grid-cols-3 gap-4">
       {[
-        ["1 · ANSWER", "Kết luận trước, không rào đón", "“Có — agent xử lý được nhiều khách cùng lúc.”"],
-        ["2 · SUPPORT", "Đúng 1 fact/bằng chứng", "“Per-conversation lock + queue, đã test 2 máy nhắn song song.”"],
-        ["3 · CONNECT", "Quay về giá trị người dùng", "“Nên giờ cao điểm trưa không khách nào phải chờ.”"],
+        ["1 · ANSWER", "Conclusion first, no hedging.", "“Yes — the agent handles many customers at once.”"],
+        ["2 · SUPPORT", "Exactly one fact.", "“Per-conversation lock + queue, tested with two phones in parallel.”"],
+        ["3 · CONNECT", "Back to user value.", "“So at the lunch peak, no customer waits.”"],
       ].map(([t, d, ex]) => (
         <div key={t} className="rounded-2xl bg-white/10 p-5">
           <p className="text-[15px] font-black uppercase tracking-[0.12em] text-[#F2A33C]">{t}</p>
@@ -107,21 +110,21 @@ export const appendixSlidesB = [
         </div>
       ))}
     </div>
-    <div className="mt-6"><Callout dark>Bị hỏi thứ chưa có: “Chưa validated — cái chúng tôi biết là X, và sẽ test bằng Y ở pilot.” · Mở đầu Q&A: “Cho phép em gom câu hỏi trước ạ?” (0:20 gom · 1:20 trả lời)</Callout></div>
+    <div className="mt-6"><Callout dark>Asked something we don't have: “Not validated yet — what we know is X, and we'll test it with Y in the pilot.” · Opening Q&A: “May I gather the questions first?” (0:20 gather · 1:20 answer)</Callout></div>
   </Slide>,
 
   // ── Q&A prep 2: 6 câu 1-dòng ──────────────────────────────────
-  <Slide key="qa2" footer="Q&A Prep · nội bộ" dark>
-    <Eyebrow dark>6 câu 1-dòng theo rubric — cả team thuộc lòng</Eyebrow>
-    <Title>Mỗi tiêu chí, một câu</Title>
+  <Slide key="qa2" footer="Q&A Prep · internal" dark>
+    <Eyebrow dark>One line per rubric criterion — the whole team knows these by heart</Eyebrow>
+    <Title>Six one-line answers, one per rubric criterion</Title>
     <div className="mt-6 grid flex-1 grid-rows-6 gap-2">
       {[
-        ["AGENTIC AI", "Agent lập kế hoạch và hành động qua 14 tools khoá theo trạng thái — tool-trace hiện từng quyết định theo thời gian thực."],
-        ["TRACK FIT", "Giải đúng P4 của KFC: kênh chat đang 100% xử lý tay, chúng tôi biến nó thành kênh bán hàng tự động đầu tiên."],
-        ["EXECUTION", "Flow 11 bước chạy thật trên Messenger: đặt → thanh toán → tracking → giao — eval 26/26, smoke 25/25."],
-        ["IMPACT", "Đơn chốt trong chat <2 phút, upsell theo ngưỡng voucher tăng AOV, đội trực page thoát việc lặp lại."],
-        ["CREATIVITY", "Hybrid: LLM giữ hội thoại, state machine giữ tiền — general assistant không được phép cầm tiền, hệ này thì có, an toàn."],
-        ["CLARITY", "Một câu kể lại được: “Nhắn tin cho KFC như nhắn bạn — và đơn hàng tự chạy tới cửa.”"],
+        ["AGENTIC AI", "The agent plans and acts through 14 state-locked tools — the tool-trace shows each decision in real time."],
+        ["TRACK FIT", "Solves KFC's P4 exactly: the chat channel is 100% hand-handled; we turn it into the first automated sales channel."],
+        ["EXECUTION", "An 11-step flow live on Messenger: order → pay → track → deliver — eval 26/26, smoke 25/25."],
+        ["IMPACT", "Orders close in chat in under 2 minutes, voucher-threshold upsell lifts AOV, the page team is freed from repetitive work."],
+        ["CREATIVITY", "Hybrid: the LLM holds the conversation, the state machine holds the money — a general assistant can't handle money; this system can, safely."],
+        ["CLARITY", "One sentence to retell: “Text KFC like texting a friend — and the order runs itself to your door.”"],
       ].map(([k, v]) => (
         <div key={k} className="flex items-center gap-4 rounded-xl bg-white/8 px-5 py-2.5">
           <span className="w-[130px] shrink-0 text-[12.5px] font-black uppercase tracking-[0.1em] text-[#F2A33C]">{k}</span>

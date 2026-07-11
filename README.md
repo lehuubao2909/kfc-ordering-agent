@@ -15,7 +15,7 @@
 | 📊 Admin dashboard | `/admin` — funnel, AOV uplift, upsell acceptance, NLU eval, đơn live |
 | 🧑‍💼 Staff console | `/staff` — hội thoại + **nhật ký quyết định của agent**, tiếp quản chat, chuyển trạng thái đơn |
 | 🎞️ Pitch deck (web) | `/presentation` — ←/→ chuyển slide · F fullscreen |
-| 📄 Pitch deck (PDF) | [`/kfc-ordering-agent-slides.pdf`](https://kfc-ordering-agent.vercel.app/kfc-ordering-agent-slides.pdf) |
+| 📄 Pitch deck (PDF nộp) | [`/kfc-ordering-agent-slides.pdf`](https://kfc-ordering-agent.vercel.app/kfc-ordering-agent-slides.pdf) — 7 trang, kết thúc ở Thanks |
 | 🔒 Privacy policy | `/privacy-policy` |
 
 *`/admin` và `/staff`: form đăng nhập đã **điền sẵn tài khoản demo** (**kfc / demo2026**) — chỉ cần bấm "Vào trang quản trị". Đổi credentials: env `ADMIN_BASIC_AUTH` + `NEXT_PUBLIC_DEMO_ADMIN_AUTH`.*
@@ -68,7 +68,7 @@ npm run dev                  # http://localhost:3000
 | `ADMIN_BASIC_AUTH` | `user:pass` cho `/admin`, `/staff` |
 | `NEXT_PUBLIC_APP_URL` · `NEXT_PUBLIC_MESSENGER_URL` | Link tracking/thanh toán trong chat · QR landing |
 
-**Scripts hữu ích:** `npm run eval` (NLU eval 26 case, ghi `src/fixtures/eval-results.json`) · `npm run reset-demo` (dọn data demo, giữ catalog) · `npx tsx scripts/smoke-test-services.ts` (25 test service) · `npx tsx scripts/smoke-test-store-resolution.ts` · `npx tsx scripts/smoke-test-session-heal.ts` · `bash scripts/export-slides-pdf.sh` (xuất lại PDF deck).
+**Scripts hữu ích:** `npm run eval` (NLU eval 26 case, ghi `src/fixtures/eval-results.json`) · `npm run reset-demo` (dọn data demo, giữ catalog) · `npx tsx scripts/smoke-test-services.ts` (25 test service) · `npx tsx scripts/smoke-test-store-resolution.ts` · `npx tsx scripts/smoke-test-session-heal.ts` · `bash scripts/export-slides-pdf.sh` (xuất lại 2 PDF deck: bản nộp + bản nội bộ).
 
 ## 📚 Tài liệu
 
@@ -78,8 +78,9 @@ npm run dev                  # http://localhost:3000
 
 | Cần gì | Ở đâu |
 |---|---|
-| Slide trình chiếu (17 trang: 6 deck chính + A1–A8 + Q&A prep) | [`/presentation`](https://kfc-ordering-agent.vercel.app/presentation) · nguồn: `src/components/presentation/` |
-| PDF slide để nộp | [`public/kfc-ordering-agent-slides.pdf`](public/kfc-ordering-agent-slides.pdf) |
+| Slide trình chiếu (18 trang: 7 deck chính + A1–A8 + Q&A prep · tiếng Anh, nội dung theo bản của thành viên thuyết trình) | [`/presentation`](https://kfc-ordering-agent.vercel.app/presentation) · nguồn: `src/components/presentation/` |
+| PDF **nộp BTC** (7 trang deck chính, kết thúc ở Demo + Thanks) | [`public/kfc-ordering-agent-slides.pdf`](public/kfc-ordering-agent-slides.pdf) |
+| PDF **nội bộ** (full 18 trang: + appendix A1–A8 + Q&A prep) | [`public/kfc-ordering-agent-slides-internal-qa.pdf`](public/kfc-ordering-agent-slides-internal-qa.pdf) |
 | Kịch bản pitch 5' + Q&A drill 9 câu + checklist nộp portal từng field | [plans/…/phase-05](plans/260709-1803-aabw-kfc-fnb-hackathon/phase-05-integration-demo-pitch-submission.md) |
 | Phân tích đề bài, rubric, lý do chọn P4 | [plans/reports/analysis…](plans/reports/analysis-260709-1803-aabw-kfc-evaluation.md) |
 | Số liệu evidence (eval, backtest) | `src/fixtures/eval-results.json` · `src/fixtures/funnel-backtest.json` |
