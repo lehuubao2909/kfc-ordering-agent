@@ -13,6 +13,10 @@
 | `src/lib/agent/**`, `src/lib/channels/**`, `src/app/api/webhooks/**`, `scripts/agent-eval*` | **Dev B** |
 | `src/app/**` pages + `src/components/**` | **Dev C** |
 
+## Sync tài liệu & UI mỗi lần cập nhật (quy tắc từ 11/7 tối)
+- Đổi feature/flow → cập nhật NGAY: README.md (nếu ảnh hưởng thông tin dự án), docs/ liên quan, và slide (`src/components/presentation/` + chạy lại `bash scripts/export-slides-pdf.sh` nếu nội dung slide đổi).
+- Đổi UI → PHẢI verify bằng mắt trước khi push: screenshot headless Chrome (nhiều viewport) hoặc đọc lại PDF từng trang — không tin build xanh là đủ.
+
 ## Quy tắc code
 - Business logic CHỈ ở `src/lib/services/`. Route/tool/page = wrapper mỏng.
 - API route trả envelope `apiOk/apiError` (types.ts). Try/catch mọi route — không để throw 500 trần.

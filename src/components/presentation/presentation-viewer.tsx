@@ -69,20 +69,24 @@ export function PresentationViewer() {
       <button aria-label="Slide trước" onClick={() => go(-1)} className="absolute inset-y-0 left-0 z-10 w-1/4 cursor-w-resize opacity-0" />
       <button aria-label="Slide sau" onClick={() => go(1)} className="absolute inset-y-0 right-0 z-10 w-1/4 cursor-e-resize opacity-0" />
 
+      {/* Scale ở div NGOÀI (tĩnh) — motion quản lý transform riêng ở div trong, không được gộp
+          scale vào motion.div (motion sẽ đè transform → slide vỡ khổ, dính góc — bug 11/7 tối). */}
       <div style={{ width: SLIDE_W * scale, height: SLIDE_H * scale }} className="relative overflow-hidden rounded-lg shadow-[0_30px_90px_rgb(0_0_0_/_0.5)]">
-        <AnimatePresence mode="wait" custom={direction} initial={false}>
-          <motion.div
-            key={index}
-            custom={direction}
-            initial={{ opacity: 0, x: 60 * direction }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 * direction }}
-            transition={{ duration: 0.28, ease: "easeOut" }}
-            style={{ width: SLIDE_W, height: SLIDE_H, transform: `scale(${scale})`, transformOrigin: "top left" }}
-          >
-            {slides[index]}
-          </motion.div>
-        </AnimatePresence>
+        <div style={{ width: SLIDE_W, height: SLIDE_H, transform: `scale(${scale})`, transformOrigin: "top left" }}>
+          <AnimatePresence mode="wait" custom={direction} initial={false}>
+            <motion.div
+              key={index}
+              custom={direction}
+              initial={{ opacity: 0, x: 60 * direction }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 * direction }}
+              transition={{ duration: 0.28, ease: "easeOut" }}
+              style={{ width: SLIDE_W, height: SLIDE_H }}
+            >
+              {slides[index]}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Thanh điều khiển */}
