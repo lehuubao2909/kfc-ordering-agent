@@ -43,7 +43,7 @@ export const appendixSlidesB = [
     <Title>Eval tự động — không tin cảm giác</Title>
     <div className="mt-7 grid grid-cols-[0.9fr_1.1fr] gap-5">
       <Card className="flex flex-col items-center justify-center text-center">
-        <p className="text-[72px] font-black leading-none text-[#C8102E]">24/24</p>
+        <p className="text-[72px] font-black leading-none text-[#C8102E]">26/26</p>
         <p className="mt-2 text-[16px] font-bold">NLU eval tiếng Việt · gpt-5.4</p>
         <p className="mt-1 text-[13.5px] text-[#1A2233]/60">Chạy tự động qua agent thật + services thật + DB thật</p>
       </Card>
@@ -51,7 +51,7 @@ export const appendixSlidesB = [
         {[
           ["NLU (9 case)", "gọi món tự nhiên, số lượng, size mơ hồ → hỏi lại, gộp nhiều ý 1 câu"],
           ["Flow (8 case)", "confirm → giao hàng → COD/QR → tracking → huỷ đúng luật"],
-          ["Guardrail (4 case)", "món không tồn tại → không bịa · nói COD sớm → vẫn tạo đơn thật"],
+          ["Guardrail (6 case)", "món không tồn tại → không bịa · nói COD sớm → vẫn tạo đơn thật"],
           ["Store-aware (3 case)", "resolve đúng quận · cửa hàng đóng → chuyển · món hết → gợi ý thay"],
         ].map(([k, v]) => (
           <div key={k} className="flex items-center gap-3 rounded-xl border border-[#1A2233]/10 bg-white px-4 py-2">
@@ -118,7 +118,7 @@ export const appendixSlidesB = [
       {[
         ["AGENTIC AI", "Agent lập kế hoạch và hành động qua 14 tools khoá theo trạng thái — tool-trace hiện từng quyết định theo thời gian thực."],
         ["TRACK FIT", "Giải đúng P4 của KFC: kênh chat đang 100% xử lý tay, chúng tôi biến nó thành kênh bán hàng tự động đầu tiên."],
-        ["EXECUTION", "Flow 11 bước chạy thật trên Messenger: đặt → thanh toán → tracking → giao — eval 24/24, smoke 25/25."],
+        ["EXECUTION", "Flow 11 bước chạy thật trên Messenger: đặt → thanh toán → tracking → giao — eval 26/26, smoke 25/25."],
         ["IMPACT", "Đơn chốt trong chat <2 phút, upsell theo ngưỡng voucher tăng AOV, đội trực page thoát việc lặp lại."],
         ["CREATIVITY", "Hybrid: LLM giữ hội thoại, state machine giữ tiền — general assistant không được phép cầm tiền, hệ này thì có, an toàn."],
         ["CLARITY", "Một câu kể lại được: “Nhắn tin cho KFC như nhắn bạn — và đơn hàng tự chạy tới cửa.”"],

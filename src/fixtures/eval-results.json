@@ -1,6 +1,6 @@
 {
-  "passed": 25,
+  "passed": 26,
   "total": 26,
-  "comment": "NLU eval 25/26 (96%) · model gpt-5.4 · 294.0s",
-  "generatedAt": "2026-07-11T16:41:57.257Z"
+  "comment": "NLU eval 26/26 (100%) · model gpt-5.4 · 303.1s",
+  "generatedAt": "2026-07-11T16:47:28.066Z"
 }

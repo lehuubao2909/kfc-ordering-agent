@@ -28,7 +28,7 @@
 - **Store-aware** — route đơn về đúng cửa hàng theo địa chỉ (match quận, không cần geocoding), check giờ mở cửa + tồn món per-store trước khi nhận đơn.
 - **Upsell deterministic** — daypart + co-occurrence đếm từ 4.964 giao dịch POS mô phỏng + gợi ý theo ngưỡng voucher ("thêm 11k nữa là freeship, lợi 20k") — không LLM trong đường tính tiền.
 - **Human oversight** — khiếu nại/nhạy cảm → chuyển nhân viên; staff tiếp quản 1 nút; khách luôn biết đang nói chuyện với bot hay người.
-- **Đo được** — eval suite 24 kịch bản tiếng Việt (có case bẫy): **24/24**.
+- **Đo được** — eval suite 26 kịch bản tiếng Việt (có case bẫy): **26/26**.
 
 ## 🏗️ Kiến trúc
 
@@ -68,7 +68,7 @@ npm run dev                  # http://localhost:3000
 | `ADMIN_BASIC_AUTH` | `user:pass` cho `/admin`, `/staff` |
 | `NEXT_PUBLIC_APP_URL` · `NEXT_PUBLIC_MESSENGER_URL` | Link tracking/thanh toán trong chat · QR landing |
 
-**Scripts hữu ích:** `npm run eval` (NLU eval 24 case, ghi `src/fixtures/eval-results.json`) · `npm run reset-demo` (dọn data demo, giữ catalog) · `npx tsx scripts/smoke-test-services.ts` (25 test service) · `npx tsx scripts/smoke-test-store-resolution.ts` · `npx tsx scripts/smoke-test-session-heal.ts` · `bash scripts/export-slides-pdf.sh` (xuất lại PDF deck).
+**Scripts hữu ích:** `npm run eval` (NLU eval 26 case, ghi `src/fixtures/eval-results.json`) · `npm run reset-demo` (dọn data demo, giữ catalog) · `npx tsx scripts/smoke-test-services.ts` (25 test service) · `npx tsx scripts/smoke-test-store-resolution.ts` · `npx tsx scripts/smoke-test-session-heal.ts` · `bash scripts/export-slides-pdf.sh` (xuất lại PDF deck).
 
 ## 📚 Tài liệu
 

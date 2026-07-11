@@ -111,7 +111,7 @@ export const mainDeckSlides = [
     <div className="mt-7 grid grid-cols-3 gap-4">
       <Card className="border-l-4 !border-l-[#2563EB]">
         <CardLabel color="text-[#2563EB]">Level 2 · Benchmark — ĐO ĐƯỢC</CardLabel>
-        <p className="mt-2 text-[44px] font-black leading-none">24/24</p>
+        <p className="mt-2 text-[44px] font-black leading-none">26/26</p>
         <p className="mt-2 text-[14.5px] leading-snug text-[#1A2233]/75">NLU eval tiếng Việt tự động, có case bẫy chống bịa món · chạy lại sau mỗi thay đổi (bắt được 2 regression trong ngày)</p>
       </Card>
       <Card className="border-l-4 !border-l-[#F2A33C]">
@@ -126,7 +126,7 @@ export const mainDeckSlides = [
       </Card>
     </div>
     <div className="mt-5 grid grid-cols-4 gap-3">
-      {[["Order completion", "flow 11 bước chạy thật"], ["NLU accuracy", "24/24 · gpt-5.4"], ["Upsell theo ngưỡng", "“thêm 11k → freeship, lợi 20k”"], ["Voucher tự áp", "mã tốt nhất, không cần nhớ"]].map(([k, v]) => (
+      {[["Order completion", "flow 11 bước chạy thật"], ["NLU accuracy", "26/26 · gpt-5.4"], ["Upsell theo ngưỡng", "“thêm 11k → freeship, lợi 20k”"], ["Voucher tự áp", "mã tốt nhất, không cần nhớ"]].map(([k, v]) => (
         <div key={k} className="rounded-xl border border-[#1A2233]/10 bg-white px-4 py-3">
           <p className="text-[12.5px] font-black uppercase tracking-[0.1em] text-[#2563EB]">{k}</p>
           <p className="mt-1 text-[13.5px] font-semibold text-[#1A2233]/75">{v}</p>
@@ -147,7 +147,7 @@ export const mainDeckSlides = [
           { label: "10–20s · TRIGGER", note: "“Cho anh combo gà rán + pepsi”" },
           { label: "20–45s · AGENT ACTS", note: "Tool-trace chạy: cart → upsell mốc voucher → store → COD" },
           { label: "45–55s · OUTCOME", note: "Mã đơn KFC-xxxx + link tracking về máy khách" },
-          { label: "55–60s · PROOF", note: "Admin: funnel + AOV + NLU 24/24 nhảy số live" },
+          { label: "55–60s · PROOF", note: "Admin: funnel + AOV + NLU 26/26 nhảy số live" },
         ]}
       />
     </div>
