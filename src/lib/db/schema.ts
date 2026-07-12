@@ -73,6 +73,7 @@ export const sessions = pgTable("sessions", {
   psid: text("psid").primaryKey(),
   state: text("state").notNull().default("BROWSING"), // OrderState
   mode: text("mode").notNull().default("agent"), // agent | human (handoff)
+  handedOffAt: timestamp("handed_off_at"), // mốc chuyển human — quá 10' không staff trả lời → bot tự tiếp quản lại
   cart: jsonb("cart").$type<{ items: { itemId: string; quantity: number; note?: string }[]; voucherCode?: string }>().notNull().default({ items: [] }),
   activeOrderId: text("active_order_id"),
   storeId: text("store_id"), // cửa hàng resolve được từ địa chỉ giao (set_delivery_info)

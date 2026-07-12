@@ -16,7 +16,7 @@ import { getSession, saveSession } from "./conversation-session-store";
 import { getToolsForState } from "./agent-tools-by-state";
 import { buildToolTrace } from "./agent-trace-detail";
 import { buildSystemPrompt } from "./agent-system-prompt-vi";
-import { getCustomer } from "@/lib/services/session-data-service";
+import { getCustomer, setSessionMode } from "@/lib/services/session-data-service";
 
 export type AgentReply = {
   text: string;
@@ -29,12 +29,24 @@ export type AgentReply = {
 
 const GRACEFUL = "Dạ em bị chậm xíu, anh/chị nhắn lại giúp em ạ 🙏";
 const DEFAULT_MODEL = "gpt-4o-mini";
+const HANDOFF_STAFF_TIMEOUT_MS = 10 * 60_000; // 10' không staff trả lời → bot tự tiếp quản lại (fix 12/7)
+const STAFF_BUSY_NOTICE =
+  "Dạ nhân viên bên em đang bận chút xíu ạ 🙏 Em — trợ lý ảo — xin phép hỗ trợ tiếp anh/chị nhé.";
 
 export async function runOrderingAgentTurn(psid: string, userMessages: string[]): Promise<AgentReply> {
   const session = await getSession(psid);
 
   // Handoff đang bật → bot im, staff console lo tiếp (webhook vẫn log tin để hiển thị).
-  if (session.mode === "human") return { text: "", handedOff: true };
+  // Quá 10' mà không staff nào trả lời (mốc null của session cũ = coi như quá hạn) → bot tự tiếp quản
+  // lại + báo rõ cho khách — tránh hội thoại chết khi không ai trực console. Staff nhắn tay sẽ gia hạn mốc.
+  let staffBusyNotice = false;
+  if (session.mode === "human") {
+    const waitedMs = session.handedOffAt ? Date.now() - session.handedOffAt.getTime() : Infinity;
+    if (waitedMs < HANDOFF_STAFF_TIMEOUT_MS) return { text: "", handedOff: true };
+    await setSessionMode(psid, "agent");
+    session.mode = "agent";
+    staffBusyNotice = true;
+  }
 
   const customer = await getCustomer(psid);
   const system = buildSystemPrompt(session.state, session.cart, {
@@ -62,7 +74,7 @@ export async function runOrderingAgentTurn(psid: string, userMessages: string[])
       console.error(`agent turn lỗi (lần ${attempt + 1}):`, err);
     }
   }
-  if (!result) return { text: GRACEFUL, handedOff: false };
+  if (!result) return { text: staffBusyNotice ? `${STAFF_BUSY_NOTICE}\n\n${GRACEFUL}` : GRACEFUL, handedOff: false };
 
   // Gom mọi tool call/result qua các step để phát hiện handoff + carousel.
   const steps = result.steps ?? [];
@@ -83,9 +95,11 @@ export async function runOrderingAgentTurn(psid: string, userMessages: string[])
     (c) => c.toolName === "get_menu" && !(c.input as { query?: string } | undefined)?.query
   );
 
-  const text =
+  const replyBody =
     (result.text || "").trim() ||
     (handedOff ? "Dạ em kết nối anh/chị với nhân viên hỗ trợ ngay ạ." : "Dạ em chưa rõ ý, anh/chị nói lại giúp em nhé.");
+  // Vừa hết hạn chờ staff → mở đầu bằng lời xin lỗi "nhân viên bận" rồi mới tới câu trả lời thật
+  const text = staffBusyNotice ? `${STAFF_BUSY_NOTICE}\n\n${replyBody}` : replyBody;
 
   const newHistory = [
     ...session.history,

@@ -27,7 +27,7 @@
 - **Nhật ký quyết định hiển thị** — mỗi lượt agent chạy, staff console hiện: `🔧 Thêm vào giỏ (Gà Giòn Cay ×2) → Lưu địa chỉ · chọn cửa hàng (KFC Nguyễn Trãi) → Tạo đơn & thanh toán (KFC-0009 · tiền mặt)`.
 - **Store-aware** — route đơn về đúng cửa hàng theo địa chỉ (match quận, không cần geocoding), check giờ mở cửa + tồn món per-store trước khi nhận đơn.
 - **Upsell deterministic** — daypart + co-occurrence đếm từ 4.964 giao dịch POS mô phỏng + gợi ý theo ngưỡng voucher ("thêm 11k nữa là freeship, lợi 20k") — không LLM trong đường tính tiền.
-- **Human oversight** — khiếu nại/nhạy cảm → chuyển nhân viên; staff tiếp quản 1 nút; khách luôn biết đang nói chuyện với bot hay người.
+- **Human oversight** — khiếu nại/nhạy cảm → chuyển nhân viên; staff tiếp quản 1 nút; khách luôn biết đang nói chuyện với bot hay người; không ai trực quá 10 phút → bot xin lỗi "nhân viên đang bận" và tự tiếp quản lại (staff nhắn tay sẽ gia hạn cửa sổ).
 - **Đo được** — eval suite 26 kịch bản tiếng Việt (có case bẫy): **26/26**.
 
 ## 🏗️ Kiến trúc

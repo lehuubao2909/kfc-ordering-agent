@@ -17,6 +17,7 @@ export type ConversationSession = {
   psid: string;
   state: OrderState;
   mode: SessionMode;
+  handedOffAt: Date | null; // mốc chuyển human — core dùng để hết-hạn handoff khi không ai trực
   cart: Cart;
   activeOrderId: string | null;
   history: { role: string; content: string }[];
@@ -62,6 +63,7 @@ export async function getSession(psid: string): Promise<ConversationSession> {
     psid: row.psid,
     state,
     mode: row.mode as SessionMode,
+    handedOffAt: row.handedOffAt ?? null,
     cart,
     activeOrderId: row.activeOrderId ?? null,
     history: (row.history as { role: string; content: string }[]) ?? [],

@@ -50,7 +50,19 @@ export async function setSessionActiveOrder(psid: string, orderId: string | null
 }
 
 export async function setSessionMode(psid: string, mode: "agent" | "human"): Promise<void> {
-  await db.update(sessions).set({ mode, updatedAt: new Date() }).where(eq(sessions.psid, psid));
+  // human → ghi mốc handoff (bot tự tiếp quản lại sau 10' không ai trực) · agent → xoá mốc
+  await db
+    .update(sessions)
+    .set({ mode, handedOffAt: mode === "human" ? new Date() : null, updatedAt: new Date() })
+    .where(eq(sessions.psid, psid));
+}
+
+/** Staff vừa nhắn tay trong human mode → gia hạn mốc handoff, bot không chen giữa cuộc chat thật. */
+export async function refreshHandoffActivity(psid: string): Promise<void> {
+  await db
+    .update(sessions)
+    .set({ handedOffAt: new Date() })
+    .where(and(eq(sessions.psid, psid), eq(sessions.mode, "human")));
 }
 
 // ===== Customer (delivery info + reorder) =====
