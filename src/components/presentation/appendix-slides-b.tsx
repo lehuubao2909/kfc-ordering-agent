@@ -1,5 +1,6 @@
 /**
- * Appendix A5–A8 + 2 slide Q&A prep (chỉ có trong bản PDF NỘI BỘ, không nằm trong bản nộp).
+ * Appendix A5–A8 (hiện trong viewer /presentation + PDF nội bộ) và 2 slide Q&A prep
+ * (qaPrepSlides — CHỈ trong PDF nội bộ, không hiện ở /presentation vì đó là bản đứng thuyết trình).
  * Nội dung tiếng Anh theo bản thành viên (12/7) — sửa số cũ: eval 24/24 → 26/26, Guardrail 4 → 6 case.
  */
 import { Slide, Eyebrow, Title, Card, CardLabel, Callout } from "./slide-frame";
@@ -92,7 +93,10 @@ export const appendixSlidesB = [
       </Card>
     </div>
   </Slide>,
+];
 
+/** 2 slide "bài thuộc lòng" Q&A của team — nội bộ, chỉ xuất trong PDF internal. */
+export const qaPrepSlides = [
   // ── Q&A prep 1: công thức ─────────────────────────────────────
   <Slide key="qa1" footer="Q&A Prep · internal" dark>
     <Eyebrow dark>Q&A · 15–25 seconds per answer</Eyebrow>

@@ -11,6 +11,8 @@ import { mainDeckSlides } from "./main-deck-slides";
 import { appendixSlidesA } from "./appendix-slides-a";
 import { appendixSlidesB } from "./appendix-slides-b";
 
+// Bản ĐỨNG THUYẾT TRÌNH: deck chính + appendix A1–A8 (bằng chứng Q&A) — KHÔNG gồm 2 slide
+// Q&A prep nội bộ (bài thuộc lòng của team, chỉ nằm trong PDF internal).
 const slides = [...mainDeckSlides, ...appendixSlidesA, ...appendixSlidesB];
 
 export function PresentationViewer() {
@@ -71,7 +73,7 @@ export function PresentationViewer() {
 
       {/* Scale ở div NGOÀI (tĩnh) — motion quản lý transform riêng ở div trong, không được gộp
           scale vào motion.div (motion sẽ đè transform → slide vỡ khổ, dính góc — bug 11/7 tối). */}
-      <div style={{ width: SLIDE_W * scale, height: SLIDE_H * scale }} className="relative overflow-hidden rounded-lg shadow-[0_30px_90px_rgb(0_0_0_/_0.5)]">
+      <div style={{ width: SLIDE_W * scale, height: SLIDE_H * scale }} className={`relative overflow-hidden ${isFullscreen ? "" : "rounded-lg shadow-[0_30px_90px_rgb(0_0_0_/_0.5)]"}`}>
         <div style={{ width: SLIDE_W, height: SLIDE_H, transform: `scale(${scale})`, transformOrigin: "top left" }}>
           <AnimatePresence mode="wait" custom={direction} initial={false}>
             <motion.div
@@ -89,8 +91,8 @@ export function PresentationViewer() {
         </div>
       </div>
 
-      {/* Thanh điều khiển */}
-      <div className="absolute bottom-4 z-20 flex items-center gap-3 rounded-full bg-white/10 px-4 py-2 backdrop-blur">
+      {/* Thanh điều khiển — ẨN khi fullscreen để slide chiếm trọn màn (điều khiển bằng ←/→/Space, F/Esc thoát) */}
+      <div className={`absolute bottom-4 z-20 flex items-center gap-3 rounded-full bg-white/10 px-4 py-2 backdrop-blur ${isFullscreen ? "hidden" : ""}`}>
         <button onClick={() => go(-1)} disabled={index === 0} className="rounded-full px-3 py-1.5 text-sm font-black text-white hover:bg-white/15 disabled:opacity-30">←</button>
         <span className="min-w-[64px] text-center font-mono text-sm font-bold text-white/80">{index + 1} / {slides.length}</span>
         <button onClick={() => go(1)} disabled={index === slides.length - 1} className="rounded-full px-3 py-1.5 text-sm font-black text-white hover:bg-white/15 disabled:opacity-30">→</button>
@@ -99,8 +101,10 @@ export function PresentationViewer() {
         <a href="/kfc-ordering-agent-slides.pdf" target="_blank" className="rounded-full px-3 py-1.5 text-sm font-black text-[#F2A33C] hover:bg-white/15">PDF ↓</a>
       </div>
 
-      {/* Progress */}
-      <div className="absolute inset-x-0 top-0 h-0.5 bg-white/10"><div className="h-full bg-[#C8102E] transition-all duration-300" style={{ width: `${((index + 1) / slides.length) * 100}%` }} /></div>
+      {/* Progress — cũng ẩn khi fullscreen */}
+      {!isFullscreen ? (
+        <div className="absolute inset-x-0 top-0 h-0.5 bg-white/10"><div className="h-full bg-[#C8102E] transition-all duration-300" style={{ width: `${((index + 1) / slides.length) * 100}%` }} /></div>
+      ) : null}
     </div>
   );
 }

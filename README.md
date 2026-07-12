@@ -78,7 +78,7 @@ npm run dev                  # http://localhost:3000
 
 | Cần gì | Ở đâu |
 |---|---|
-| Slide trình chiếu (18 trang: 7 deck chính + A1–A8 + Q&A prep · tiếng Anh, nội dung theo bản của thành viên thuyết trình) | [`/presentation`](https://kfc-ordering-agent.vercel.app/presentation) · nguồn: `src/components/presentation/` |
+| Slide đứng thuyết trình (16 trang: 7 deck chính + A1–A8 · tiếng Anh, KHÔNG gồm Q&A prep nội bộ) | [`/presentation`](https://kfc-ordering-agent.vercel.app/presentation) · nguồn: `src/components/presentation/` |
 | PDF **nộp BTC** (7 trang deck chính, kết thúc ở Demo + Thanks) | [`public/kfc-ordering-agent-slides.pdf`](public/kfc-ordering-agent-slides.pdf) |
 | PDF **nội bộ** (full 18 trang: + appendix A1–A8 + Q&A prep) | [`public/kfc-ordering-agent-slides-internal-qa.pdf`](public/kfc-ordering-agent-slides-internal-qa.pdf) |
 | Kịch bản pitch 5' + Q&A drill 9 câu + checklist nộp portal từng field | [plans/…/phase-05](plans/260709-1803-aabw-kfc-fnb-hackathon/phase-05-integration-demo-pitch-submission.md) |

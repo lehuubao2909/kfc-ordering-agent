@@ -7,7 +7,7 @@
 import type { Metadata } from "next";
 import { mainDeckSlides } from "@/components/presentation/main-deck-slides";
 import { appendixSlidesA } from "@/components/presentation/appendix-slides-a";
-import { appendixSlidesB } from "@/components/presentation/appendix-slides-b";
+import { appendixSlidesB, qaPrepSlides } from "@/components/presentation/appendix-slides-b";
 
 export const metadata: Metadata = { title: "Print · KFC Ordering Agent Deck", robots: { index: false } };
 
@@ -15,7 +15,7 @@ export default async function PresentationPrintPage({ searchParams }: { searchPa
   const { version } = await searchParams;
   const slides = version === "submission"
     ? mainDeckSlides
-    : [...mainDeckSlides, ...appendixSlidesA, ...appendixSlidesB];
+    : [...mainDeckSlides, ...appendixSlidesA, ...appendixSlidesB, ...qaPrepSlides];
 
   return (
     <>
