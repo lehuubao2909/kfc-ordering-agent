@@ -27,18 +27,18 @@ export function PresentationViewer() {
     setIndex((i) => Math.min(slides.length - 1, Math.max(0, i + delta)));
   }, []);
 
-  // Scale slide 1280×720 khớp viewport (giữ tỉ lệ, chừa lề)
+  // Scale slide 1280×720 VỪA KHÍT viewport (fix 12/7: bỏ pad 48px + đo bằng ResizeObserver —
+  // bản cũ đo 1 lần lúc mount có thể dính kích thước chưa ổn định → slide nhỏ, hở cả 4 phía).
+  // Giữ đúng 16:9: chiều bị dư chỉ còn letterbox nền tối, chiều kia chạm mép màn hình.
   useEffect(() => {
-    const fit = () => {
-      const el = shellRef.current;
-      if (!el) return;
-      const pad = isFullscreen ? 0 : 48;
-      setScale(Math.min((el.clientWidth - pad) / SLIDE_W, (el.clientHeight - pad) / SLIDE_H));
-    };
+    const el = shellRef.current;
+    if (!el) return;
+    const fit = () => setScale(Math.min(el.clientWidth / SLIDE_W, el.clientHeight / SLIDE_H));
     fit();
-    window.addEventListener("resize", fit);
-    return () => window.removeEventListener("resize", fit);
-  }, [isFullscreen]);
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
